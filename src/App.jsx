@@ -1,37 +1,28 @@
 import React, { useState } from 'react';
-import WeatherUpdates from './WeatherUpdates';
-import Signup from './Signup';
+import GetStarted from './GetStarted';
+import Login from './Login';
 import Home from './Home';
-import MyCrops from './MyCrops';
-
+import './App.css';
 function App() {
-  const [currentPage, setCurrentPage] = useState('welcome');
-
-  if (currentPage === 'weather') {
-    return <WeatherUpdates onBack={() => setCurrentPage('home')} />;
-  }
-
-  if (currentPage === 'mycrops') {
-    return <MyCrops onBack={() => setCurrentPage('home')} />;
-  }
-
-  if (currentPage === 'home') {
-    return <Home onNavigate={(page) => setCurrentPage(page)} />;
-  }
-
-  if (currentPage === 'signup') {
-    return <Signup onContinue={() => setCurrentPage('home')} />;
-  }
+  // Navigation State
+  const [currentPage, setCurrentPage] = useState('get-started');
 
   return (
-    <div style={{ padding: '20px', textAlign: 'center' }}>
-      <h1>Welcome to AgroSmart</h1>
-      <button 
-        style={{ padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-        onClick={() => setCurrentPage('home')}
-      >
-        Go to Home
-      </button>
+    <div className="main-app">
+      {/* 1. Get Started Screen */}
+      {currentPage === 'get-started' && (
+        <GetStarted onNext={() => setCurrentPage('login')} />
+      )}
+
+      {/* 2. Login Screen */}
+      {currentPage === 'login' && (
+        <Login onLoginSuccess={() => setCurrentPage('home')} />
+      )}
+
+      {/* 3. Home Screen */}
+      {currentPage === 'home' && (
+        <Home />
+      )}
     </div>
   );
 }
