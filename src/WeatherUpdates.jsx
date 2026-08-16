@@ -1,281 +1,177 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './App.css';
 
-const WeatherUpdates = () => {
+function WeatherUpdates() {
+  const navigate = useNavigate();
+  const [city, setCity] = useState("Colombo");
+  const [searchInput, setSearchInput] = useState("");
+  const [weatherData, setWeatherData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+
+  const fetchWeather = async (cityName) => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=metric`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setWeatherData(data);
+      } else {
+        setError("City not found. Please try again.");
+      }
+    } catch (err) {
+      setError("Failed to fetch weather data.");
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchWeather(city);
+  }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchInput.trim() !== "") {
+      setCity(searchInput);
+      fetchWeather(searchInput);
+      setSearchInput("");
+    }
+  };
+
   return (
-    <div style={styles.container}>
-      {/* Header */}
-      <div style={styles.header}>
-        <span style={styles.backArrow}>←</span>
-        <h2 style={styles.headerTitle}>Weather Updates</h2>
-      </div>
+    <div className="dash-page-wrapper">
+      <div className="dash-card-container" style={{ maxWidth: '900px', margin: '0 auto' }}>
+        
+        {/* Top Banner with Back Button */}
+        <div className="dash-top-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 25px' }}>
+          <h1 style={{ margin: 0, fontSize: '22px' }}>AgroSmart Weather</h1>
+          <button 
+            onClick={() => navigate('/')} 
+            style={{
+              background: '#ffffff',
+              color: '#2e7d32',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            Back to Dashboard
+          </button>
+        </div>
 
-      <div style={styles.content}>
-        {/* Main Weather Card */}
-        <div style={styles.mainCard}>
-          <div style={styles.locationRow}>
-            <span style={styles.locationIcon}>📍</span>
-            <span style={styles.locationName}>Galle</span>
-          </div>
+        {/* Search Bar Section */}
+        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px', margin: '20px 0' }}>
+          <input 
+            type="text" 
+            placeholder="Search city (e.g., Colombo, Kandy)..." 
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            style={{
+              flex: 1,
+              padding: '12px 20px',
+              borderRadius: '12px',
+              border: '1px solid #ccc',
+              fontSize: '15px',
+              outline: 'none',
+              backgroundColor: '#f9f9f9'
+            }}
+          />
+          <button 
+            type="submit"
+            style={{
+              padding: '12px 25px',
+              background: '#2e7d32',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '12px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            Search
+          </button>
+        </form>
 
-          <div style={styles.tempRow}>
-            <div>
-              <h1 style={styles.temperature}>29° C</h1>
-              <p style={styles.weatherCondition}>Partly Rainy</p>
-            </div>
+        {error && <p style={{ color: 'red', textAlign: 'center', fontWeight: '500' }}>{error}</p>}
 
-            {/* පින්තූර නොමැතිව සාදාගත් Sun + Cloud Combo එක */}
-            <div style={styles.weatherIllustration}>
-              <div style={styles.sunCloudWrapper}>
-                <span style={styles.sunIcon}>☀️</span>
-                <span style={styles.cloudIcon}>🌧️</span>
+        {loading ? (
+          <p style={{ textAlign: 'center', padding: '40px', color: '#555' }}>Loading weather details...</p>
+        ) : weatherData && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px' }}>
+            
+            {/* Main Weather Display Card */}
+            <div style={{
+              background: '#ffffff',
+              padding: '30px',
+              borderRadius: '20px',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              border: '1px solid #eaeaea'
+            }}>
+              <div>
+                <h3 style={{ color: '#666', fontSize: '16px', margin: '0 0 10px 0' }}>Current Weather</h3>
+                <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#1a1a1a' }}>
+                  {Math.round(weatherData.main.temp)}°C
+                </div>
+                <p style={{ fontSize: '18px', fontWeight: '600', color: '#2e7d32', margin: '5px 0 15px 0' }}>
+                  {weatherData.weather[0].main}
+                </p>
+              </div>
+              <div style={{ color: '#555', fontSize: '14px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
+                📍 {weatherData.name}, {weatherData.sys.country}
               </div>
             </div>
+
+            {/* Sub Info Cards Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              
+              <div style={{ background: '#ffffff', padding: '20px', borderRadius: '15px', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', border: '1px solid #eaeaea' }}>
+                <span style={{ fontSize: '13px', color: '#666' }}>FEELS LIKE</span>
+                <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a1a1a', marginTop: '8px' }}>
+                  {Math.round(weatherData.main.feels_like)}°C
+                </div>
+              </div>
+
+              <div style={{ background: '#ffffff', padding: '20px', borderRadius: '15px', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', border: '1px solid #eaeaea' }}>
+                <span style={{ fontSize: '13px', color: '#666' }}>HUMIDITY</span>
+                <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a1a1a', marginTop: '8px' }}>
+                  {weatherData.main.humidity}%
+                </div>
+              </div>
+
+              <div style={{ background: '#ffffff', padding: '20px', borderRadius: '15px', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', border: '1px solid #eaeaea' }}>
+                <span style={{ fontSize: '13px', color: '#666' }}>WIND SPEED</span>
+                <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a1a1a', marginTop: '8px' }}>
+                  {weatherData.wind.speed} m/s
+                </div>
+              </div>
+
+              <div style={{ background: '#ffffff', padding: '20px', borderRadius: '15px', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', border: '1px solid #eaeaea' }}>
+                <span style={{ fontSize: '13px', color: '#666' }}>PRESSURE</span>
+                <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a1a1a', marginTop: '8px' }}>
+                  {weatherData.main.pressure} hPa
+                </div>
+              </div>
+
+            </div>
+
           </div>
+        )}
 
-          {/* Weather Stats */}
-          <div style={styles.statsContainer}>
-            <div style={styles.statBox}>
-              <span style={styles.statLabel}>Humidity</span>
-              <span style={styles.statValue}>78%</span>
-            </div>
-            <div style={styles.divider} />
-            <div style={styles.statBox}>
-              <span style={styles.statLabel}>Rain Probability</span>
-              <span style={styles.statValue}>80%</span>
-            </div>
-            <div style={styles.divider} />
-            <div style={styles.statBox}>
-              <span style={styles.statLabel}>Wind Speed</span>
-              <span style={styles.statValue}>12km/h</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 5 Day Forecast */}
-        <div style={styles.forecastSection}>
-          <h3 style={styles.sectionTitle}>5 Day Forecast</h3>
-          
-          <div style={styles.forecastGrid}>
-            <div style={styles.forecastDay}>
-              <span style={styles.dayText}>Today</span>
-              <span style={styles.forecastIcon}>⛅</span>
-              <span style={styles.highTemp}>29°</span>
-              <span style={styles.lowTemp}>22°</span>
-            </div>
-
-            <div style={styles.forecastDay}>
-              <span style={styles.dayText}>Wed</span>
-              <span style={styles.forecastIcon}>☁️</span>
-              <span style={styles.highTemp}>28°</span>
-              <span style={styles.lowTemp}>21°</span>
-            </div>
-
-            <div style={styles.forecastDay}>
-              <span style={styles.dayText}>Thu</span>
-              <span style={styles.forecastIcon}>🌧️</span>
-              <span style={styles.highTemp}>27°</span>
-              <span style={styles.lowTemp}>21°</span>
-            </div>
-
-            <div style={styles.forecastDay}>
-              <span style={styles.dayText}>Fri</span>
-              <span style={styles.forecastIcon}>⛅</span>
-              <span style={styles.highTemp}>29°</span>
-              <span style={styles.lowTemp}>22°</span>
-            </div>
-
-            <div style={styles.forecastDay}>
-              <span style={styles.dayText}>Sat</span>
-              <span style={styles.forecastIcon}>☀️</span>
-              <span style={styles.highTemp}>30°</span>
-              <span style={styles.lowTemp}>23°</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Alert Banner */}
-        <div style={styles.alertCard}>
-          <div style={styles.alertIcon}>⚠️</div>
-          <div>
-            <h4 style={styles.alertTitle}>Alert</h4>
-            <p style={styles.alertMessage}>
-              Tomorrow heavy rain expected. Protect your crops.
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '400px',
-    margin: '0 auto',
-    backgroundColor: '#f8faf9',
-    minHeight: '100vh',
-    fontFamily: 'sans-serif',
-  },
-  header: {
-    backgroundColor: '#2e7d32',
-    color: '#fff',
-    padding: '15px 20px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '15px',
-  },
-  backArrow: {
-    fontSize: '20px',
-    cursor: 'pointer',
-  },
-  headerTitle: {
-    margin: 0,
-    fontSize: '20px',
-  },
-  content: {
-    padding: '20px',
-  },
-  mainCard: {
-    backgroundColor: '#81d4fa',
-    borderRadius: '16px',
-    padding: '20px',
-    color: '#1a237e',
-  },
-  locationRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    fontSize: '18px',
-    fontWeight: 'bold',
-  },
-  tempRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    margin: '15px 0',
-  },
-  temperature: {
-    fontSize: '36px',
-    margin: 0,
-  },
-  weatherCondition: {
-    margin: '5px 0 0 0',
-    fontSize: '16px',
-  },
-  weatherIllustration: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingRight: '10px',
-  },
-  sunCloudWrapper: {
-    position: 'relative',
-    width: '70px',
-    height: '60px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sunIcon: {
-    fontSize: '40px',
-    position: 'absolute',
-    top: '0',
-    right: '5px',
-    filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.15))',
-  },
-  cloudIcon: {
-    fontSize: '42px',
-    position: 'absolute',
-    bottom: '0',
-    left: '0',
-    filter: 'drop-shadow(0px 3px 5px rgba(0,0,0,0.2))',
-  },
-  statsContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    borderRadius: '12px',
-    padding: '12px 10px',
-    display: 'flex',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  statBox: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  statLabel: {
-    fontSize: '11px',
-    color: '#333',
-    textAlign: 'center',
-  },
-  statValue: {
-    fontSize: '14px',
-    fontWeight: 'bold',
-    color: '#000',
-    marginTop: '4px',
-  },
-  divider: {
-    width: '1px',
-    height: '25px',
-    backgroundColor: '#ccc',
-  },
-  forecastSection: {
-    marginTop: '25px',
-  },
-  sectionTitle: {
-    fontSize: '16px',
-    marginBottom: '15px',
-    color: '#333',
-  },
-  forecastGrid: {
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-  forecastDay: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '6px',
-  },
-  dayText: {
-    fontSize: '13px',
-    fontWeight: 'bold',
-    color: '#444',
-  },
-  forecastIcon: {
-    fontSize: '22px',
-  },
-  highTemp: {
-    fontSize: '14px',
-    fontWeight: 'bold',
-  },
-  lowTemp: {
-    fontSize: '12px',
-    color: '#888',
-  },
-  alertCard: {
-    marginTop: '30px',
-    backgroundColor: '#fff3cd',
-    border: '1px solid #ffeeba',
-    borderRadius: '12px',
-    padding: '15px',
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '12px',
-  },
-  alertIcon: {
-    fontSize: '22px',
-  },
-  alertTitle: {
-    margin: 0,
-    fontSize: '15px',
-    color: '#856404',
-  },
-  alertMessage: {
-    margin: '4px 0 0 0',
-    fontSize: '12px',
-    color: '#856404',
-  },
-};
+}
 
 export default WeatherUpdates;
