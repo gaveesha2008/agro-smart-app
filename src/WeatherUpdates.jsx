@@ -84,7 +84,7 @@ export default function WeatherUpdates() {
   const t = content[language] || content['English'];
 
   return (
-    <div style={{ padding: '20px', maxWidth: '650px', margin: '0 auto', fontFamily: 'sans-serif', background: '#f8f9fa', minHeight: '100vh', paddingBottom: '90px', boxSizing: 'border-box' }}>
+    <div style={{ padding: '20px', fontFamily: 'sans-serif', background: '#f8f9fa', minHeight: '100vh', paddingBottom: '90px', boxSizing: 'border-box', width: '100%', flex: 1 }}>
       
       {/* Top Header */}
       <div style={{ background: '#1db954', color: 'white', padding: '16px', borderRadius: '14px', textAlign: 'center', marginBottom: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>

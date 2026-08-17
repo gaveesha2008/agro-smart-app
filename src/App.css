@@ -5,28 +5,52 @@
 }
 
 html, body, #root {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  min-height: 100%; min-height: 100dvh;
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  background-color: #f0f2f5;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100%; min-height: 100dvh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background-color: #faf7e8; /* Default app background */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-top: env(safe-area-inset-top);
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    box-shadow: none;
+  }
 }
 
 /* =========================================
    1. GET STARTED PAGE STYLES
    ========================================= */
 .page-container {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   position: relative;
   overflow: hidden;
   background-color: #ffffff;
 }
 
 .get-started-page {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
@@ -95,8 +119,8 @@ html, body, #root {
    2. SIGNUP / LOGIN PAGE STYLES
    ========================================= */
 .signup-page-wrapper {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   background-color: #faf7e8;
   display: flex;
   justify-content: center;
@@ -107,7 +131,7 @@ html, body, #root {
 .signup-card-container {
   width: 100%;
   max-width: 440px;
-  height: 100vh;
+  height: 100%; min-height: 100dvh;
   background-color: #faf7e8;
   display: flex;
   flex-direction: column;
@@ -244,8 +268,8 @@ html, body, #root {
    3. DASHBOARD PAGE STYLES
    ========================================= */
 .dash-page-wrapper {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   background-color: #fdfdfd;
   display: flex;
   justify-content: center;
@@ -256,7 +280,7 @@ html, body, #root {
 .dash-card-container {
   width: 100%;
   max-width: 440px;
-  height: 100vh;
+  height: 100%; min-height: 100dvh;
   display: flex;
   flex-direction: column;
   padding-bottom: 10px;
@@ -399,8 +423,8 @@ html, body, #root {
    4. MY CROPS PAGE STYLES
    ========================================= */
 .my-crops-page {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   background: #fdfdfd;
   display: flex;
   justify-content: center;
@@ -411,7 +435,7 @@ html, body, #root {
 .my-crops-container {
   width: 100%;
   max-width: 440px;
-  height: 100vh;
+  height: 100%; min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background-color: #fdfdfd;
@@ -611,8 +635,8 @@ html, body, #root {
    5. DISEASE DETECTION PAGE STYLES
    ========================================= */
 .disease-page {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   background: #faf7e8;
   display: flex;
   justify-content: center;
@@ -623,7 +647,7 @@ html, body, #root {
 .disease-container {
   width: 100%;
   max-width: 440px;
-  height: 100vh;
+  height: 100%; min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background-color: #faf7e8;
@@ -734,8 +758,8 @@ html, body, #root {
    6. CROP MONITORING PAGE STYLES
    ========================================= */
 .crop-monitoring-page {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   background: #faf7e8;
   display: flex;
   justify-content: center;
@@ -745,7 +769,7 @@ html, body, #root {
 .crop-monitoring-container {
   width: 100%;
   max-width: 440px;
-  height: 100vh;
+  height: 100%; min-height: 100dvh;
   background-color: #faf7e8;
   padding: 0 16px 20px 16px;
   overflow-y: auto;
@@ -813,8 +837,8 @@ html, body, #root {
    7. FARMING REMINDER PAGE STYLES
    ========================================= */
 .reminder-page {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   background: #faf7e8;
   display: flex;
   justify-content: center;
@@ -825,7 +849,7 @@ html, body, #root {
 .reminder-container {
   width: 100%;
   max-width: 440px;
-  height: 100vh;
+  height: 100%; min-height: 100dvh;
   background-color: #faf7e8;
   display: flex;
   flex-direction: column;
@@ -994,8 +1018,8 @@ html, body, #root {
    8. MARKET PRICES PAGE STYLES
    ========================================= */
 .market-page {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   background: #faf7e8;
   display: flex;
   justify-content: center;
@@ -1006,7 +1030,7 @@ html, body, #root {
 .market-container {
   width: 100%;
   max-width: 440px;
-  height: 100vh;
+  height: 100%; min-height: 100dvh;
   background-color: #faf7e8;
   display: flex;
   flex-direction: column;
@@ -1183,8 +1207,8 @@ html, body, #root {
    10. PROFILE PAGE STYLES
    ========================================= */
 .profile-page {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   background: #faf7e8;
   display: flex;
   justify-content: center;
@@ -1195,7 +1219,7 @@ html, body, #root {
 .profile-container {
   width: 100%;
   max-width: 440px;
-  height: 100vh;
+  height: 100%; min-height: 100dvh;
   background-color: #faf7e8;
   display: flex;
   flex-direction: column;
@@ -1333,8 +1357,8 @@ html, body, #root {
    LANGUAGE PAGE STYLES
    ========================================= */
 .lang-page {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%; min-height: 100dvh;
   background: #faf7e8;
   display: flex;
   justify-content: center;

@@ -1,27 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import MobileLayout from './MobileLayout';
+
 
 export default function Profile() {
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState(localStorage.getItem('userName') || 'Kamal Perera');
+  const [phone, setPhone] = useState(localStorage.getItem('userPhone') || '074 123 0247');
+  const [location, setLocation] = useState(localStorage.getItem('userLocation') || 'Galle');
+  const [email, setEmail] = useState(localStorage.getItem('userEmail') || 'kamal@gmail.com');
+
+  const handleSave = () => {
+    localStorage.setItem('userName', name);
+    localStorage.setItem('userPhone', phone);
+    localStorage.setItem('userLocation', location);
+    localStorage.setItem('userEmail', email);
+    setIsEditing(false);
+  };
 
   return (
-    <MobileLayout>
-      {/* 
-        paddingBottom එක 130px දක්වා වැඩි කර ඇති බැවින්, 
-        දැන් පහළම ඇති Logout සහ About Agrosmart කොටස් 
-        කිසිදු බාධාවකින් තොරව පහළට ස්ක්‍රෝල් කර සම්පූර්ණයෙන් බලාගත හැක.
-      */}
-      <div style={{ 
-        padding: '24px 20px', 
-        flex: 1, 
-        boxSizing: 'border-box', 
-        width: '100%', 
-        maxWidth: '750px', 
-        margin: '0 auto', 
-        paddingBottom: '130px', 
-        backgroundColor: '#fdfdfb' 
-      }}>
+    <div style={{ 
+      padding: '24px 20px', 
+      flex: 1, 
+      boxSizing: 'border-box', 
+      width: '100%', 
+      paddingBottom: '130px', 
+      backgroundColor: '#fdfdfb',
+      minHeight: '100vh'
+    }}>
         
         {/* Profile Title */}
         <h2 style={{ 
@@ -70,11 +76,22 @@ export default function Profile() {
               }}>
                 👤
               </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#222' }}>Kamal Perera</h3>
-                <p style={{ margin: '4px 0', fontSize: '14px', color: '#555' }}>074 123 0247</p>
-                <p style={{ margin: 0, fontSize: '14px', color: '#555' }}>Galle</p>
-              </div>
+              {isEditing ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'left' }}>
+                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px' }} placeholder="Name" />
+                  <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px' }} placeholder="Phone" />
+                  <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px' }} placeholder="Location" />
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px' }} placeholder="Email" />
+                  <button onClick={handleSave} style={{ background: '#2e7d32', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>Save</button>
+                </div>
+              ) : (
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#222' }}>{name}</h3>
+                  <p style={{ margin: '4px 0 2px 0', fontSize: '14px', color: '#555' }}>{phone}</p>
+                  <p style={{ margin: '0 0 2px 0', fontSize: '13px', color: '#777' }}>{email}</p>
+                  <p style={{ margin: 0, fontSize: '14px', color: '#2e7d32', fontWeight: 'bold' }}>📍 {location}</p>
+                </div>
+              )}
             </div>
             <span style={{ fontSize: '20px', color: '#666', fontWeight: 'bold', cursor: 'pointer' }}>&gt;</span>
           </div>
@@ -83,7 +100,7 @@ export default function Profile() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             
             <div 
-              onClick={() => navigate('/edit-profile')} 
+              onClick={() => setIsEditing(true)} 
               style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '6px 0' }}
             >
               <span style={{ fontSize: '15px', color: '#333', fontWeight: '500' }}>Edit Profile</span>
@@ -131,6 +148,5 @@ export default function Profile() {
         </div>
 
       </div>
-    </MobileLayout>
   );
 }

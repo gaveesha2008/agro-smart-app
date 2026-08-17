@@ -23,16 +23,20 @@ export default function BottomNav() {
     <div style={{
       position: 'fixed',
       bottom: 0,
-      left: 0,
+      left: '50%',
+      transform: 'translateX(-50%)',
       width: '100%',
+      maxWidth: '480px',
       backgroundColor: '#ffffff',
       borderTop: '1px solid #e0e0e0',
       display: 'flex',
       justifyContent: 'space-around',
       alignItems: 'center',
-      padding: '10px 0',
+      paddingTop: '10px',
+      paddingBottom: 'calc(10px + env(safe-area-inset-bottom))',
       boxShadow: '0 -2px 10px rgba(0,0,0,0.05)',
-      zIndex: 1000
+      zIndex: 1000,
+      boxSizing: 'border-box'
     }}>
       {navItems.map((item, index) => {
         const isActive = location.pathname === item.path;

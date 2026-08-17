@@ -8,18 +8,26 @@ export default function Signup() {
   const [error, setError] = useState('');
 
   const handleContinue = () => {
-    if (!email || !email.includes('@')) {
-      setError('Please enter a valid email address to continue.');
-      return;
-    }
+    const finalEmail = email.trim() || 'guest@agrosmart.com';
     setError('');
+    localStorage.setItem('userEmail', finalEmail);
+    if (!localStorage.getItem('userName')) {
+      localStorage.setItem('userName', 'Kamal Perera');
+    }
+    if (!localStorage.getItem('userPhone')) {
+      localStorage.setItem('userPhone', '074 123 0247');
+    }
+    if (!localStorage.getItem('userLocation')) {
+      localStorage.setItem('userLocation', 'Galle');
+    }
     navigate('/home');
   };
 
   return (
     <div style={{ 
-      width: '100vw', 
-      height: '100vh', 
+      width: '100%', 
+      flex: 1,
+      minHeight: '100vh', 
       backgroundColor: '#f9f9f7', 
       display: 'flex',
       justifyContent: 'center',

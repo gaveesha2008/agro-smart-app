@@ -57,14 +57,13 @@ export default function Home() {
     <div style={{ 
       padding: '15px', 
       width: '100%', 
-      maxWidth: '390px', 
-      margin: '0 auto', 
       boxSizing: 'border-box', 
       backgroundColor: '#f7f9f2', 
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      gap: '15px'
+      gap: '15px',
+      flex: 1
     }}>
       
       {/* Header Section */}
