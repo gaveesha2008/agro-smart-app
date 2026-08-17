@@ -1,55 +1,64 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-function BottomNav() {
+export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isActive = (path) => location.pathname === path;
+  // Get Started සහ Sign (Login/Register) පිටුවලදී මෙම BottomNav එක පෙන්වීම වළක්වයි
+  const hideInPages = ['/', '/login', '/register', '/get-started'];
+  if (hideInPages.includes(location.pathname)) {
+    return null;
+  }
+
+  const navItems = [
+    { label: 'Home', icon: '🏠', path: '/home' },
+    { label: 'Crops', icon: '🌱', path: '/my-crops' },
+    { label: 'Scan', icon: '📷', path: '/disease-detection' },
+    { label: 'Market', icon: '📊', path: '/market-prices' },
+    { label: 'Profile', icon: '👤', path: '/profile' },
+  ];
 
   return (
-    <div className="bottom-nav-bar">
-      <div 
-        className={`bottom-nav-item ${isActive('/home') ? 'active' : ''}`}
-        onClick={() => navigate('/home')}
-      >
-        <span className="bottom-nav-icon">🏠</span>
-        <span className="bottom-nav-text">Home</span>
-      </div>
-
-      <div 
-        className={`bottom-nav-item ${isActive('/my-crops') ? 'active' : ''}`}
-        onClick={() => navigate('/my-crops')}
-      >
-        <span className="bottom-nav-icon">🌱</span>
-        <span className="bottom-nav-text">Crops</span>
-      </div>
-
-      <div 
-        className={`bottom-nav-item ${isActive('/disease-detection') ? 'active' : ''}`}
-        onClick={() => navigate('/disease-detection')}
-      >
-        <span className="bottom-nav-icon">📷</span>
-        <span className="bottom-nav-text">Scan</span>
-      </div>
-
-      <div 
-        className={`bottom-nav-item ${isActive('/market-prices') ? 'active' : ''}`}
-        onClick={() => navigate('/market-prices')}
-      >
-        <span className="bottom-nav-icon">📊</span>
-        <span className="bottom-nav-text">Market</span>
-      </div>
-
-      <div 
-        className={`bottom-nav-item ${isActive('/profile') ? 'active' : ''}`}
-        onClick={() => navigate('/profile')}
-      >
-        <span className="bottom-nav-icon">👤</span>
-        <span className="bottom-nav-text">Profile</span>
-      </div>
+    <div style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      width: '100%',
+      backgroundColor: '#ffffff',
+      borderTop: '1px solid #e0e0e0',
+      display: 'flex',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      padding: '10px 0',
+      boxShadow: '0 -2px 10px rgba(0,0,0,0.05)',
+      zIndex: 1000
+    }}>
+      {navItems.map((item, index) => {
+        const isActive = location.pathname === item.path;
+        return (
+          <button
+            key={index}
+            onClick={() => navigate(item.path)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              color: isActive ? '#2e7d32' : '#757575',
+              fontSize: '11px',
+              fontWeight: isActive ? 'bold' : 'normal',
+              flex: 1
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>{item.icon}</span>
+            <span>{item.label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
-
-export default BottomNav;

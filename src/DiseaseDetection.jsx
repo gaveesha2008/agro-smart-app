@@ -1,47 +1,57 @@
 import React from 'react';
+import { useLanguage } from './LanguageContext';
 import { useNavigate } from 'react-router-dom';
-import './App.css';
 
-function DiseaseDetection() {
+export default function DiseaseDetection() {
+  const { language } = useLanguage();
   const navigate = useNavigate();
 
+  const content = {
+    English: {
+      title: "Disease Detection",
+      uploadTitle: "Upload Leaf Image",
+      uploadSub: "Tap to upload or take a photo",
+      takePhoto: "Take Photo",
+      tip: "Tip: Make sure that leaf is clear and visible for accurate results."
+    },
+    Sinhala: {
+      title: "රෝග හඳුනාගැනීම",
+      uploadTitle: "පත්‍රයක පින්තූරයක් උඩුගත කරන්න",
+      uploadSub: "උඩුගත කිරීමට හෝ ඡායාරූපයක් ගැනීමට තට්ටු කරන්න",
+      takePhoto: "ඡායාරූපයක් ගන්න",
+      tip: "ඉඟිය: නිවැරදි ප්‍රතිඵල සඳහා කොළය පැහැදිලිව පෙනෙන බවට වග බලා ගන්න."
+    },
+    Tamil: {
+      title: "நோய் கண்டறிதல்",
+      uploadTitle: "இலை படத்தைப் பதிவேற்றவும்",
+      uploadSub: "பதிவேற்ற அல்லது புகைப்படம் எடுக்க தட்டவும்",
+      takePhoto: "புகைப்படம் எடு",
+      tip: "உதவிக்குறிப்பு: துல்லியமான முடிவுகளுக்கு இலை தெளிவாகத் தெரிவதை உறுதிப்படுத்தவும்."
+    }
+  };
+
+  const t = content[language] || content['English'];
+
   return (
-    <div className="disease-page">
-      <div className="disease-container">
-        
-        {/* Top Banner */}
-        <div className="disease-top-banner">
-          <button className="disease-back-btn" onClick={() => navigate(-1)}>←</button>
-          <h1>Disease Detection</h1>
-        </div>
+    <div style={{ padding: '20px' }}>
+      <div style={{ background: '#2e7d32', color: 'white', padding: '15px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <button onClick={() => navigate('/home')} style={{ background: 'none', border: 'none', color: 'white', fontSize: '18px', cursor: 'pointer' }}>←</button>
+        <h2>{t.title}</h2>
+      </div>
 
-        {/* Upload Box */}
-        <div className="upload-box">
-          <div className="upload-icon-area">
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#1b8e5a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
-          </div>
-          <h2>Upload Leaf Image</h2>
-          <p>Tap to upload or take a photo</p>
-        </div>
+      <div style={{ border: '2px dashed #2e7d32', padding: '40px', textAlign: 'center', borderRadius: '10px', margin: '30px 0', background: '#f9f9f9' }}>
+        <div style={{ fontSize: '40px', color: '#2e7d32', marginBottom: '10px' }}>📤</div>
+        <h3>{t.uploadTitle}</h3>
+        <p style={{ color: '#666', fontSize: '14px' }}>{t.uploadSub}</p>
+      </div>
 
-        {/* Take Photo Button */}
-        <button className="take-photo-btn">
-          📷 Take Photo
-        </button>
+      <button style={{ width: '100%', background: '#00b074', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontSize: '16px', cursor: 'pointer' }}>
+        📷 {t.takePhoto}
+      </button>
 
-        {/* Tip Box */}
-        <div className="disease-tip-box">
-          <span className="tip-icon">🌿</span>
-          <p><strong>Tip:</strong> Make sure that leaf is clear and visible for accurate results</p>
-        </div>
-
+      <div style={{ marginTop: '20px', padding: '12px', background: '#e8f5e9', borderRadius: '8px', color: '#2e7d32', fontSize: '14px' }}>
+        🌿 {t.tip}
       </div>
     </div>
   );
 }
-
-export default DiseaseDetection;
