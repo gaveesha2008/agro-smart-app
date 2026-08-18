@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from './LanguageContext';
 
 import leafLogo from './assets/leaf-logo.png';
 import weatherCard from './assets/weather-card.png';
@@ -8,125 +9,169 @@ import diseaseCard from './assets/disease-card.png';
 import monitoringCard from './assets/monitoring-card.png';
 import reminderCard from './assets/reminder-card.png';
 import marketCard from './assets/market-card.png';
-import alertCloud from './assets/alert-cloud.png';
 
 export default function Home() {
   const navigate = useNavigate();
+  const { language } = useLanguage();
 
-  // Figma නිර්මාණයේ ඇති නිවැරදි වර්ණ
-  const cardColors = {
-    weather: '#99ccff',
-    crops: '#b8cc99',
-    disease: '#7fa67f',
-    monitoring: '#ffd9b3',
-    reminder: '#cca366',
-    market: '#e6b8e6'
+  const t = {
+    English: {
+      title: "AgroSmart",
+      welcome: "Hello, Farmer!",
+      subText: "Good morning! Let's make farming smarter today.",
+      weather: "Weather Updates",
+      crops: "My Crops",
+      disease: "Disease Detection",
+      monitoring: "Crop Monitoring",
+      reminder: "Farming Reminder",
+      market: "Market Price",
+      profileBtn: "User Profile"
+    },
+    Sinhala: {
+      title: "ඇග්‍රෝ ස්මාර්ට්",
+      welcome: "ආයුබෝවන්, ගොවි මහත්මයා!",
+      subText: "සුභ උදෑසනක්! අද ඔබේ ගොවිතැන් කටයුතු වඩාත් ස්මාර්ට් කරමු.",
+      weather: "කාලගුණ යාවත්කාලීන",
+      crops: "මගේ වගා",
+      disease: "පැලෑටි රෝග හඳුනාගැනීම",
+      monitoring: "වගා නිරීක්ෂණය",
+      reminder: "ගොවිතැන් මතක් කිරීම්",
+      market: "වෙළඳපළ මිල",
+      profileBtn: "පරිශීලක පැතිකඩ"
+    },
+    Tamil: {
+      title: "அக்ரோ-ஸ்மார்ட்",
+      welcome: "வணக்கம், விவசாயியே!",
+      subText: "காலை வணக்கம்! இன்று விவசாயத்தை மிகவும் ஸ்மார்ட்டாக செய்வோம்.",
+      weather: "வானிலை நிலவரம்",
+      crops: "எனது பயிர்கள்",
+      disease: "நோய் கண்டறிதல்",
+      monitoring: "பயிர் கண்காணிப்பு",
+      reminder: "விவசாய நினைவூட்டல்",
+      market: "சந்தை விலை",
+      profileBtn: "பயனர் சுயவிவரம்"
+    }
   };
 
-  const buttonStyle = (bgColor) => ({
-    background: bgColor,
-    border: 'none',
-    padding: '12px 8px',
-    borderRadius: '12px',
-    cursor: 'pointer',
-    textAlign: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '8px',
-    boxSizing: 'border-box',
-    width: '100%',
-    transition: 'transform 0.2s ease'
-  });
-
-  const iconStyle = { 
-    width: '50px', 
-    height: '50px', 
-    objectFit: 'contain'
-  };
-
-  const textStyle = { 
-    fontSize: '11px', 
-    fontWeight: '700', 
-    color: '#000', 
-    margin: 0,
-    fontFamily: 'serif'
-  };
+  const currentText = t[language] || t.English;
 
   return (
     <div style={{ 
-      padding: '15px', 
+      padding: '10px 16px', 
       width: '100%', 
       boxSizing: 'border-box', 
-      backgroundColor: '#f7f9f2', 
-      minHeight: '100vh',
+      maxWidth: '480px', 
+      margin: '0 auto',
+      height: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      gap: '15px',
-      flex: 1
+      justifyContent: 'space-between'
     }}>
       
-      {/* Header Section */}
-      <div style={{ 
-        backgroundColor: '#20a444', 
-        color: '#fff', 
-        padding: '15px', 
-        borderRadius: '15px', 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center'
+      {/* Top Banner */}
+      <div style={{
+        backgroundColor: '#2e7d32',
+        borderRadius: '14px',
+        padding: '14px 16px',
+        color: 'white',
+        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
       }}>
-        <div style={{ flex: 1 }}>
-          <h2 style={{ margin: '0 0 5px 0', fontSize: '22px' }}>AgroSmart</h2>
-          <p style={{ margin: 0, fontSize: '12px' }}>Hello, Farmer!</p>
-          <p style={{ margin: '5px 0 0 0', fontSize: '10px', opacity: 0.9 }}>Good morning! Let's make farming smarter today.</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ margin: 0, fontSize: '20px' }}>{currentText.title}</h2>
+          <img src={leafLogo} alt="Logo" style={{ width: '32px', height: '32px' }} />
         </div>
-        <img src={leafLogo} alt="Logo" style={{ width: '50px', height: '50px' }} />
+        <p style={{ margin: '8px 0 3px 0', fontSize: '15px', fontWeight: 'bold' }}>{currentText.welcome}</p>
+        <p style={{ margin: 0, fontSize: '12px', opacity: 0.9 }}>{currentText.subText}</p>
       </div>
 
-      {/* Grid Section */}
+      {/* Cards Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-        {[
-          { path: '/weather', color: cardColors.weather, img: weatherCard, label: 'Weather Updates' },
-          { path: '/my-crops', color: cardColors.crops, img: myCropsCard, label: 'My Crops' },
-          { path: '/disease-detection', color: cardColors.disease, img: diseaseCard, label: 'Disease Detection' },
-          { path: '/crop-monitoring', color: cardColors.monitoring, img: monitoringCard, label: 'Crop Monitoring' },
-          { path: '/farming-reminder', color: cardColors.reminder, img: reminderCard, label: 'Farming Reminder' },
-          { path: '/market-prices', color: cardColors.market, img: marketCard, label: 'Market Price' }
-        ].map((item, index) => (
-          <button 
-            key={index}
-            onClick={() => navigate(item.path)} 
-            style={buttonStyle(item.color)}
-          >
-            <img src={item.img} alt={item.label} style={iconStyle} />
-            <span style={textStyle}>{item.label}</span>
-          </button>
-        ))}
+        
+        {/* Weather Updates */}
+        <div 
+          onClick={() => navigate('/weather')}
+          style={{ backgroundColor: '#e3f2fd', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+            <img src={weatherCard} alt="Weather" style={{ width: '32px', height: '32px', display: 'block' }} />
+          </div>
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.weather}</h4>
+        </div>
+
+        {/* My Crops */}
+        <div 
+          onClick={() => navigate('/my-crops')}
+          style={{ backgroundColor: '#e8f5e9', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+            <img src={myCropsCard} alt="Crops" style={{ width: '32px', height: '32px', display: 'block' }} />
+          </div>
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.crops}</h4>
+        </div>
+
+        {/* Disease Detection */}
+        <div 
+          onClick={() => navigate('/disease-detection')}
+          style={{ backgroundColor: '#e0f2f1', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+            <img src={diseaseCard} alt="Disease" style={{ width: '32px', height: '32px', display: 'block' }} />
+          </div>
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.disease}</h4>
+        </div>
+
+        {/* Crop Monitoring */}
+        <div 
+          onClick={() => navigate('/crop-monitoring')}
+          style={{ backgroundColor: '#f1f8e9', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+            <img src={monitoringCard} alt="Monitoring" style={{ width: '32px', height: '32px', display: 'block' }} />
+          </div>
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.monitoring}</h4>
+        </div>
+
+        {/* Farming Reminder */}
+        <div 
+          onClick={() => navigate('/farming-reminder')}
+          style={{ backgroundColor: '#fffde7', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+            <img src={reminderCard} alt="Reminder" style={{ width: '32px', height: '32px', display: 'block' }} />
+          </div>
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.reminder}</h4>
+        </div>
+
+        {/* Market Price */}
+        <div 
+          onClick={() => navigate('/market-prices')}
+          style={{ backgroundColor: '#efebe9', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+            <img src={marketCard} alt="Market" style={{ width: '32px', height: '32px', display: 'block' }} />
+          </div>
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.market}</h4>
+        </div>
+
       </div>
 
       {/* User Profile Button */}
-      <button 
-        onClick={() => navigate('/profile')} 
-        style={{ width: '100%', padding: '12px', background: '#455a64', color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}
+      <div 
+        onClick={() => navigate('/profile')}
+        style={{
+          backgroundColor: '#2e7d32',
+          color: 'white',
+          padding: '12px',
+          borderRadius: '12px',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: '14px',
+          cursor: 'pointer',
+          boxShadow: '0 4px 10px rgba(46, 125, 50, 0.2)',
+          marginBottom: '55px'
+        }}
       >
-        User Profile
-      </button>
-
-      {/* Alert Box */}
-      <div style={{ 
-        backgroundColor: '#fff', 
-        padding: '10px', 
-        borderRadius: '10px', 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '8px', 
-        border: '1px solid #000' 
-      }}>
-        <img src={alertCloud} alt="Alert" style={{ width: '24px', height: '24px' }} />
-        <p style={{ margin: 0, fontSize: '11px', fontWeight: 'bold', color: '#000' }}>
-          Alert: Heavy rain expected tomorrow. Protect your crops.
-        </p>
+        {currentText.profileBtn}
       </div>
 
     </div>
