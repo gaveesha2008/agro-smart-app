@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 export default function WeatherUpdates() {
   const { language } = useLanguage();
   const navigate = useNavigate();
-  const [cityInput, setCityInput] = useState('Colombo');
-  const [city, setCity] = useState('Colombo');
+  const [cityInput, setCityInput] = useState('Galle');
+  const [city, setCity] = useState('Galle');
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
 

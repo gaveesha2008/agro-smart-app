@@ -1436,3 +1436,28 @@ html, body, #root {
   font-weight: 800;
   cursor: pointer;
 }
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f6368;
+}
+
+.password-toggle-btn svg {
+  width: 20px;
+  height: 20px;
+}

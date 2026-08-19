@@ -30,7 +30,7 @@ export default function GetStarted() {
       {/* බොත්තම් අඩංගු ප්‍රධාන පෙට්ටිය */}
       <div style={{ width: '92%', maxWidth: '650px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         
-        {/* GET STARTED Button - මෙහිදී /home වෙනුවට /signup වෙත යොමු කර ඇත */}
+        {/* GET STARTED Button - මෙහිදී /signup වෙත යොමු කර ඇත */}
         <button 
           onClick={() => navigate('/signup')}
           style={{ 

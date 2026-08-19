@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
+import { db } from './firebase.js'; // Firebase සම්බන්ධ කිරීම සඳහා
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function MarketPrices() {
   const navigate = useNavigate();
@@ -8,6 +10,8 @@ export default function MarketPrices() {
 
   const [selectedCenter, setSelectedCenter] = useState('Peliyagoda Manning Economic Center');
   const [searchTerm, setSearchTerm] = useState('');
+  const [firebaseCrops, setFirebaseCrops] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // භාෂා පරිවර්තන
   const t = {
@@ -42,7 +46,7 @@ export default function MarketPrices() {
 
   const currentText = t[language] || t.English;
 
-  // එක් එක් ආර්ථික මධ්‍යස්ථානයට අදාළ වෙනස් වන සැබෑ මිල දත්ත (Dynamic Center-wise Data)
+  // ස්ථාවර දත්ත (Fallback Data - Firebase එකෙන් ඩේටා නොමැති නම් හෝ ළෝඩ් වීමේදී පෙන්වීමට)
   const allCenterPrices = {
     "Peliyagoda Manning Economic Center": [
       { id: 1, name: { English: 'Paddy', Sinhala: 'වී', Tamil: 'நெல்' }, price: 'Rs. 122.04/kg', change: '+2.04', isUp: true, icon: '🌾' },
@@ -91,15 +95,51 @@ export default function MarketPrices() {
   // මධ්‍යස්ථාන ලැයිස්තුව
   const centers = Object.keys(allCenterPrices);
 
-  // තෝරාගත් මධ්‍යස්ථානයට අදාළ දත්ත ලබාගැනීම (නැතහොත් ඩිෆෝල්ට් ලෙස Manning දත්ත පෙන්වීම)
-  const marketData = allCenterPrices[selectedCenter] || allCenterPrices["Peliyagoda Manning Economic Center"];
+  // Firebase එකෙන් දත්ත ලබා ගැනීම (Real-time Fetching)
+  useEffect(() => {
+    const fetchMarketPricesFromFirebase = async () => {
+      try {
+        setLoading(true);
+        const docRef = doc(db, 'marketPrices', selectedCenter);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data && data.crops) {
+            setFirebaseCrops(data.crops);
+          } else {
+            setFirebaseCrops(null);
+          }
+        } else {
+          setFirebaseCrops(null);
+        }
+      } catch (error) {
+        console.error('Error fetching from Firebase: ', error);
+        setFirebaseCrops(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMarketPricesFromFirebase();
+  }, [selectedCenter]);
+
+  // Firebase ඩේටා තිබේ නම් ඒවා පෙන්වීම, නැතහොත් ස්ථාවර දත්ත (allCenterPrices) පෙන්වීම
+  const marketData = firebaseCrops || allCenterPrices[selectedCenter] || allCenterPrices["Peliyagoda Manning Economic Center"];
 
   // සෙවුම් පහසුකම සඳහා පෙරහන් කිරීම
-  const filteredData = marketData.filter(item => 
-    item.name.English.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.name.Sinhala.includes(searchTerm) ||
-    item.name.Tamil.includes(searchTerm)
-  );
+  const filteredData = marketData.filter(item => {
+    const nameObj = item.name || {};
+    const enName = typeof nameObj === 'string' ? nameObj : (nameObj.English || nameObj.en || '');
+    const siName = typeof nameObj === 'object' ? (nameObj.Sinhala || nameObj.si || '') : '';
+    const taName = typeof nameObj === 'object' ? (nameObj.Tamil || nameObj.ta || '') : '';
+
+    return (
+      enName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      siName.includes(searchTerm) ||
+      taName.includes(searchTerm)
+    );
+  });
 
   const currentDate = new Date().toISOString().split('T')[0];
 
@@ -185,34 +225,45 @@ export default function MarketPrices() {
             <span style={{ textAlign: 'right' }}>{currentText.changeHeader}</span>
           </div>
 
-          {filteredData.length > 0 ? (
-            filteredData.map((item) => (
-              <div key={item.id} style={{ 
-                display: 'grid', 
-                gridTemplateColumns: '2fr 2fr 1.2fr', 
-                padding: '10px 12px', 
-                alignItems: 'center', 
-                borderBottom: '1px solid #f0f0f0',
-                fontSize: '12px'
-              }}>
-                <span style={{ fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '16px' }}>{item.icon}</span>
-                  {item.name[language] || item.name.English}
-                </span>
-                <span style={{ color: '#444', fontWeight: '500' }}>{item.price}</span>
-                <span style={{ 
-                  textAlign: 'right', 
-                  fontWeight: 'bold', 
-                  color: item.isUp ? '#2e7d32' : '#d32f2f',
-                  backgroundColor: item.isUp ? '#e8f5e9' : '#ffebee',
-                  padding: '3px 6px',
-                  borderRadius: '6px',
-                  fontSize: '11px'
+          {loading ? (
+            <div style={{ padding: '25px', textAlign: 'center', color: '#2e7d32', fontSize: '12px', fontWeight: '600' }}>
+              Loading live prices from Firebase...
+            </div>
+          ) : filteredData.length > 0 ? (
+            filteredData.map((item, index) => {
+              const nameData = item.name || {};
+              const displayName = typeof nameData === 'string' 
+                ? nameData 
+                : (nameData[language] || nameData.English || nameData.en || 'Crop');
+
+              return (
+                <div key={item.id || index} style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: '2fr 2fr 1.2fr', 
+                  padding: '10px 12px', 
+                  alignItems: 'center', 
+                  borderBottom: '1px solid #f0f0f0',
+                  fontSize: '12px'
                 }}>
-                  {item.isUp ? '▲' : '▼'} {item.change}
-                </span>
-              </div>
-            ))
+                  <span style={{ fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '16px' }}>{item.icon || '🌾'}</span>
+                    {displayName}
+                  </span>
+                  <span style={{ color: '#444', fontWeight: '500' }}>{item.price}</span>
+                  <span style={{ 
+                    textAlign: 'right', 
+                    fontWeight: 'bold', 
+                    color: item.isUp ? '#2e7d32' : '#d32f2f',
+                    backgroundColor: item.isUp ? '#e8f5e9' : '#ffebee',
+                    padding: '3px 6px',
+                    borderRadius: '6px',
+                    fontSize: '11px'
+                  }}>
+                    {item.isUp ? '▲' : '▼'} {item.change}
+                  </span>
+                </div>
+              );
+            })
           ) : (
             <div style={{ padding: '20px', textAlign: 'center', color: '#777', fontSize: '12px' }}>
               No crops found!

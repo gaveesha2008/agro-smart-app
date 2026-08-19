@@ -1,22 +1,56 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useLanguage } from './LanguageContext'; // 1. භාෂාව සඳහා මෙය ඉම්පෝර්ට් කර ඇත
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { language } = useLanguage(); // 2. භාෂාව ලබා ගැනීම
 
   // Get Started සහ Sign (Login/Register) පිටුවලදී මෙම BottomNav එක පෙන්වීම වළක්වයි
-  const hideInPages = ['/', '/login', '/register', '/get-started'];
+  const hideInPages = ['/', '/login', '/register', '/get-started', '/signup'];
   if (hideInPages.includes(location.pathname)) {
     return null;
   }
 
+  // 3. භාෂාවට අනුව යට නම වෙනස් වීමට (Texts Translation)
+  const getNavTexts = () => {
+    switch (language) {
+      case 'Sinhala':
+        return {
+          home: 'මුල් පිටුව',
+          crops: 'බෝග',
+          scan: 'ස්කෑන්',
+          market: 'වෙළඳපොළ',
+          profile: 'පැතිකඩ'
+        };
+      case 'Tamil':
+        return {
+          home: 'முகப்பு',
+          crops: 'பயிர்கள்',
+          scan: 'ஸ்கேன்',
+          market: 'சந்தை',
+          profile: 'சுயவிவரம்'
+        };
+      default:
+        return {
+          home: 'Home',
+          crops: 'Crops',
+          scan: 'Scan',
+          market: 'Market',
+          profile: 'Profile'
+        };
+    }
+  };
+
+  const t = getNavTexts();
+
   const navItems = [
-    { label: 'Home', icon: '🏠', path: '/home' },
-    { label: 'Crops', icon: '🌱', path: '/my-crops' },
-    { label: 'Scan', icon: '📷', path: '/disease-detection' },
-    { label: 'Market', icon: '📊', path: '/market-prices' },
-    { label: 'Profile', icon: '👤', path: '/profile' },
+    { label: t.home, icon: '🏠', path: '/home' },
+    { label: t.crops, icon: '🌱', path: '/my-crops' },
+    { label: t.scan, icon: '📷', path: '/disease-detection' },
+    { label: t.market, icon: '📊', path: '/market-prices' },
+    { label: t.profile, icon: '👤', path: '/profile' },
   ];
 
   return (

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
-import { app } from "./firebase";
-
-const db = getFirestore(app);
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "./firebase"; // 'app' වෙනුවට කෙලින්ම 'db' ඉම්පෝට් කරගන්න+++++++++9
 
 export default function MyCrops() {
   const [crops, setCrops] = useState([]);

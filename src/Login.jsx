@@ -1,14 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { auth } from './firebase.js'; // firebase.js පාර නිවැරදිව තබා ගන්න
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import './App.css';
 import leafLogo from './assets/leaf-logo.png';
 
 function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleContinue = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    navigate('/home');
+    setError('');
+
+    // ඊමේල් හෝ පාස්වර්ඩ් හිස් නම් පරීක්ෂා කිරීම
+    if (!email || !password) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // Firebase හරහා ලොග් වීම
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('/home');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to login. Please check your email and password.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -22,18 +46,34 @@ function Login() {
         </div>
 
         <div className="signup-green-card">
-          <h2 className="signup-account-title">Create an account</h2>
-          <p className="signup-account-subtitle">Enter your email to sign up for this app</p>
+          <h2 className="signup-account-title">Login to your account</h2>
+          <p className="signup-account-subtitle">Enter your email and password to sign in</p>
 
-          <form onSubmit={handleContinue} style={{ width: '100%' }}>
+          {error && <p style={{ color: 'red', fontSize: '12px', marginBottom: '10px', textAlign: 'center' }}>{error}</p>}
+
+          <form onSubmit={handleLogin} style={{ width: '100%' }}>
             <input 
               type="email" 
               placeholder="name@example.com" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="signup-email-input"
+              style={{ marginBottom: '10px' }}
               required
             />
-            <button type="submit" className="signup-continue-btn">
-              Continue
+            
+            <input 
+              type="password" 
+              placeholder="Enter your password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="signup-email-input"
+              style={{ marginBottom: '15px' }}
+              required
+            />
+
+            <button type="submit" className="signup-continue-btn" disabled={loading}>
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
 

@@ -13,6 +13,32 @@ export default function Language() {
     navigate('/profile'); // Save වූ පසු නැවත Profile එකට යාමට
   };
 
+  // භාෂාව අනුව පේජ් එකේ වචන වෙනස් වීමට
+  const getPageTexts = () => {
+    switch (selectedLang) {
+      case 'Sinhala':
+        return {
+          title: 'භාෂාව',
+          selectText: 'ඔබේ භාෂාව තෝරන්න',
+          saveBtn: 'සුරකින්න'
+        };
+      case 'Tamil':
+        return {
+          title: 'மொழி',
+          selectText: 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்',
+          saveBtn: 'சேமி'
+        };
+      default:
+        return {
+          title: 'Language',
+          selectText: 'Select Your Language',
+          saveBtn: 'Save'
+        };
+    }
+  };
+
+  const texts = getPageTexts();
+
   const languages = [
     { name: 'Sinhala', label: 'සිංහල' },
     { name: 'Tamil', label: 'தமிழ்' },
@@ -40,7 +66,7 @@ export default function Language() {
         marginBottom: '24px',
         marginTop: '10px'
       }}>
-        Language
+        {texts.title}
       </h2>
 
       {/* Card Container */}
@@ -57,7 +83,7 @@ export default function Language() {
         gap: '16px'
       }}>
         <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px', fontWeight: '500' }}>
-          Select Your Language
+          {texts.selectText}
         </p>
 
         {languages.map((lang) => {
@@ -79,7 +105,7 @@ export default function Language() {
               }}
             >
               <span style={{ fontSize: '16px', color: '#333', fontWeight: isSelected ? 'bold' : '500' }}>
-                {lang.name}
+                {lang.label}
               </span>
               <div style={{
                 width: '22px',
@@ -117,7 +143,7 @@ export default function Language() {
             boxShadow: '0 4px 10px rgba(46, 125, 50, 0.2)'
           }}
         >
-          Save
+          {texts.saveBtn}
         </button>
       </div>
     </div>
