@@ -7,6 +7,18 @@ export default function GetStarted() {
   const { language, setLanguage } = useLanguage();
   const navigate = useNavigate();
 
+  // භාෂාව අනුව බොත්තමේ පෙන්විය යුතු වචන
+  const translations = {
+    English: "GET STARTED >",
+    Sinhala: "ආරම්භ කරන්න >",
+    Tamil: "தொடங்க >",
+    en: "GET STARTED >",
+    si: "ආරම්භ කරන්න >",
+    ta: "தொடங்க >"
+  };
+
+  const buttonText = translations[language] || translations.English;
+
   return (
     <div style={{ 
       position: 'absolute',
@@ -30,7 +42,7 @@ export default function GetStarted() {
       {/* බොත්තම් අඩංගු ප්‍රධාන පෙට්ටිය */}
       <div style={{ width: '92%', maxWidth: '650px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         
-        {/* GET STARTED Button - මෙහිදී /signup වෙත යොමු කර ඇත */}
+        {/* GET STARTED Button */}
         <button 
           onClick={() => navigate('/signup')}
           style={{ 
@@ -46,7 +58,7 @@ export default function GetStarted() {
             boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
           }}
         >
-          GET STARTED &gt;
+          {buttonText}
         </button>
 
         {/* Language Selection Buttons */}
@@ -56,9 +68,9 @@ export default function GetStarted() {
             onClick={() => setLanguage('Sinhala')}
             style={{ 
               padding: '14px 10px', 
-              background: language === 'Sinhala' ? '#e8f5e9' : '#ffffff', 
-              color: language === 'Sinhala' ? '#1db954' : '#222', 
-              border: language === 'Sinhala' ? '2px solid #1db954' : 'none', 
+              background: language === 'Sinhala' || language === 'si' ? '#e8f5e9' : '#ffffff', 
+              color: language === 'Sinhala' || language === 'si' ? '#1db954' : '#222', 
+              border: language === 'Sinhala' || language === 'si' ? '2px solid #1db954' : 'none', 
               borderRadius: '12px', 
               fontSize: '16px', 
               fontWeight: 'bold', 
@@ -73,9 +85,9 @@ export default function GetStarted() {
             onClick={() => setLanguage('English')}
             style={{ 
               padding: '14px 10px', 
-              background: language === 'English' ? '#e8f5e9' : '#ffffff', 
-              color: language === 'English' ? '#1db954' : '#222', 
-              border: language === 'English' ? '2px solid #1db954' : 'none', 
+              background: language === 'English' || language === 'en' ? '#e8f5e9' : '#ffffff', 
+              color: language === 'English' || language === 'en' ? '#1db954' : '#222', 
+              border: language === 'English' || language === 'en' ? '2px solid #1db954' : 'none', 
               borderRadius: '12px', 
               fontSize: '16px', 
               fontWeight: 'bold', 
@@ -90,9 +102,9 @@ export default function GetStarted() {
             onClick={() => setLanguage('Tamil')}
             style={{ 
               padding: '14px 10px', 
-              background: language === 'Tamil' ? '#e8f5e9' : '#ffffff', 
-              color: language === 'Tamil' ? '#1db954' : '#222', 
-              border: language === 'Tamil' ? '2px solid #1db954' : 'none', 
+              background: language === 'Tamil' || language === 'ta' ? '#e8f5e9' : '#ffffff', 
+              color: language === 'Tamil' || language === 'ta' ? '#1db954' : '#222', 
+              border: language === 'Tamil' || language === 'ta' ? '2px solid #1db954' : 'none', 
               borderRadius: '12px', 
               fontSize: '16px', 
               fontWeight: 'bold', 
