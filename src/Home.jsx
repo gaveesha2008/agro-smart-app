@@ -120,17 +120,7 @@ export default function Home() {
           <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.disease}</h4>
         </div>
 
-        {/* Crop Monitoring */}
-        <div 
-          onClick={() => navigate('/crop-monitoring')}
-          style={{ backgroundColor: '#f1f8e9', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
-        >
-          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
-            <img src={monitoringCard} alt="Monitoring" style={{ width: '32px', height: '32px', display: 'block' }} />
-          </div>
-          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.monitoring}</h4>
-        </div>
-
+        
         {/* Farming Reminder */}
         <div 
           onClick={() => navigate('/farming-reminder')}
