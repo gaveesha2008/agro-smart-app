@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 
-const LanguageContext = createContext();
+// Named export එක
+export const LanguageContext = createContext();
 
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState('English');
@@ -15,3 +16,6 @@ export function LanguageProvider({ children }) {
 export function useLanguage() {
   return useContext(LanguageContext);
 }
+
+// අමතර ආරක්ෂාවක් ලෙස Default export එක එකතු කිරීම
+export default LanguageContext;

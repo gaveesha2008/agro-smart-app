@@ -4,14 +4,14 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
-// (ඔබේ Firebase සැබෑ විස්තර මෙහි දමා තිබිය යුතුය)
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBydZ6cHURGsMZ1IYUHgHMz66X9pL4sJiw",
+  authDomain: "agrosmart-c4a2d.firebaseapp.com",
+  databaseURL: "https://agrosmart-c4a2d-default-rtdb.firebaseio.com",
+  projectId: "agrosmart-c4a2d",
+  storageBucket: "agrosmart-c4a2d.firebasestorage.app",
+  messagingSenderId: "1071735729842",
+  appId: "1:1071735729842:web:07449f44051deedb5c23ab"
 };
 
 // Initialize Firebase

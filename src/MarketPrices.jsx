@@ -8,9 +8,8 @@ export default function MarketPrices() {
   const navigate = useNavigate();
   const { language } = useLanguage();
 
-  const [selectedCenter, setSelectedCenter] = useState('Peliyagoda Manning Economic Center');
   const [searchTerm, setSearchTerm] = useState('');
-  const [firebaseCrops, setFirebaseCrops] = useState(null);
+  const [firebaseCrops, setFirebaseCrops] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // භාෂා පරිවර්තන
@@ -18,7 +17,6 @@ export default function MarketPrices() {
     English: {
       title: "Market Prices",
       searchPlaceholder: "Search crop (e.g., Paddy, Chilli, Potato)...",
-      centerLabel: "Economic Center:",
       cropHeader: "Crop",
       priceHeader: "Today's Price",
       changeHeader: "Change",
@@ -27,7 +25,6 @@ export default function MarketPrices() {
     Sinhala: {
       title: "වෙළඳපළ මිල",
       searchPlaceholder: "බෝගයක් සොයන්න (උදා: වී, මිරිස්, අර්තාපල්)...",
-      centerLabel: "ආර්ථික මධ්‍යස්ථානය:",
       cropHeader: "බෝගය",
       priceHeader: "අද මිල",
       changeHeader: "වෙනස",
@@ -36,7 +33,6 @@ export default function MarketPrices() {
     Tamil: {
       title: "சந்தை விலை",
       searchPlaceholder: "பயிரைத் தேடுங்கள்...",
-      centerLabel: "பொருளாதார மையம்:",
       cropHeader: "பயிர்",
       priceHeader: "இன்றைய விலை",
       changeHeader: "மாற்றம்",
@@ -46,61 +42,12 @@ export default function MarketPrices() {
 
   const currentText = t[language] || t.English;
 
-  // ස්ථාවර දත්ත (Fallback Data - Firebase එකෙන් ඩේටා නොමැති නම් හෝ ළෝඩ් වීමේදී පෙන්වීමට)
-  const allCenterPrices = {
-    "Peliyagoda Manning Economic Center": [
-      { id: 1, name: { English: 'Paddy', Sinhala: 'වී', Tamil: 'நெல்' }, price: 'Rs. 122.04/kg', change: '+2.04', isUp: true, icon: '🌾' },
-      { id: 2, name: { English: 'Red Onion', Sinhala: 'රතු ළූණු', Tamil: 'சின்ன வெங்காயம்' }, price: 'Rs. 234.75/kg', change: '-15.25', isUp: false, icon: '🧅' },
-      { id: 3, name: { English: 'Big Onion', Sinhala: 'බී ළූණු', Tamil: 'வெங்காயம்' }, price: 'Rs. 280.00/kg', change: '+10.50', isUp: true, icon: '🧅' },
-      { id: 4, name: { English: 'Tomato', Sinhala: 'තක්කාලි', Tamil: 'தக்காளி' }, price: 'Rs. 151.38/kg', change: '-28.62', isUp: false, icon: '🍅' },
-      { id: 5, name: { English: 'Carrot', Sinhala: 'කැරට්', Tamil: 'கஜரட்' }, price: 'Rs. 120.30/kg', change: '-29.70', isUp: false, icon: '🥕' },
-      { id: 6, name: { English: 'Cabbage', Sinhala: 'ගෝවා', Tamil: 'முட்டைகோஸ்' }, price: 'Rs. 208.40/kg', change: '+8.40', isUp: true, icon: '🥬' },
-      { id: 7, name: { English: 'Potato', Sinhala: 'අර්තාපල්', Tamil: 'உருளைக்கிழங்கு' }, price: 'Rs. 195.00/kg', change: '+5.50', isUp: true, icon: '🥔' },
-      { id: 8, name: { English: 'Green Chilli', Sinhala: 'අමු මිරිස්', Tamil: 'பச்சை மிளகாய்' }, price: 'Rs. 450.00/kg', change: '+25.00', isUp: true, icon: '🌶️' },
-      { id: 9, name: { English: 'Beans', Sinhala: 'බෝංචි', Tamil: 'பீன்ஸ்' }, price: 'Rs. 240.00/kg', change: '-12.00', isUp: false, icon: '🌿' },
-      { id: 10, name: { English: 'Pumpkin', Sinhala: 'වට්ටක්කා', Tamil: 'பூசணிக்காய்' }, price: 'Rs. 110.00/kg', change: '+4.00', isUp: true, icon: '🎃' },
-      { id: 11, name: { English: 'Brinjal', Sinhala: 'වම්බටු', Tamil: 'கத்தரிக்காய்' }, price: 'Rs. 175.00/kg', change: '-8.50', isUp: false, icon: '🍆' },
-      { id: 12, name: { English: 'Ladies Finger', Sinhala: 'බණ්ඩක්කා', Tamil: 'வெண்டைக்காய்' }, price: 'Rs. 160.00/kg', change: '+6.00', isUp: true, icon: '🥒' }
-    ],
-    "Dambulla Dedicated Economic Center": [
-      { id: 1, name: { English: 'Paddy', Sinhala: 'වී', Tamil: 'நெல்' }, price: 'Rs. 118.00/kg', change: '+1.00', isUp: true, icon: '🌾' },
-      { id: 2, name: { English: 'Red Onion', Sinhala: 'රතු ළූණු', Tamil: 'சின்ன வெங்காயம்' }, price: 'Rs. 220.00/kg', change: '-10.00', isUp: false, icon: '🧅' },
-      { id: 3, name: { English: 'Big Onion', Sinhala: 'බී ළූණු', Tamil: 'வெங்காயம்' }, price: 'Rs. 265.00/kg', change: '+5.00', isUp: true, icon: '🧅' },
-      { id: 4, name: { English: 'Tomato', Sinhala: 'තක්කාලි', Tamil: 'தக்காளி' }, price: 'Rs. 130.00/kg', change: '-20.00', isUp: false, icon: '🍅' },
-      { id: 5, name: { English: 'Carrot', Sinhala: 'කැරට්', Tamil: 'கஜரட்' }, price: 'Rs. 110.00/kg', change: '-15.00', isUp: false, icon: '🥕' },
-      { id: 6, name: { English: 'Cabbage', Sinhala: 'ගෝවා', Tamil: 'முட்டைகோஸ்' }, price: 'Rs. 190.00/kg', change: '+4.00', isUp: true, icon: '🥬' },
-      { id: 7, name: { English: 'Potato', Sinhala: 'අර්තාපල්', Tamil: 'உருளைக்கிழங்கு' }, price: 'Rs. 180.00/kg', change: '+2.00', isUp: true, icon: '🥔' },
-      { id: 8, name: { English: 'Green Chilli', Sinhala: 'අමු මිරිස්', Tamil: 'பச்சை மிளகாய்' }, price: 'Rs. 420.00/kg', change: '+15.00', isUp: true, icon: '🌶️' },
-      { id: 9, name: { English: 'Beans', Sinhala: 'බෝංචි', Tamil: 'பீன்ஸ்' }, price: 'Rs. 220.00/kg', change: '-8.00', isUp: false, icon: '🌿' },
-      { id: 10, name: { English: 'Pumpkin', Sinhala: 'වට්ටක්කා', Tamil: 'பூசணிக்காய்' }, price: 'Rs. 95.00/kg', change: '+2.00', isUp: true, icon: '🎃' },
-      { id: 11, name: { English: 'Brinjal', Sinhala: 'වම්බටු', Tamil: 'கத்தரிக்காய்' }, price: 'Rs. 150.00/kg', change: '-5.00', isUp: false, icon: '🍆' },
-      { id: 12, name: { English: 'Ladies Finger', Sinhala: 'බණ්ඩක්කා', Tamil: 'வெண்டைக்காய்' }, price: 'Rs. 140.00/kg', change: '+3.00', isUp: true, icon: '🥒' }
-    ],
-    "Narahenpita Economic Center": [
-      { id: 1, name: { English: 'Paddy', Sinhala: 'වී', Tamil: 'நெல்' }, price: 'Rs. 125.00/kg', change: '+3.00', isUp: true, icon: '🌾' },
-      { id: 2, name: { English: 'Red Onion', Sinhala: 'රතු ළූණු', Tamil: 'சின்ன வெங்காயம்' }, price: 'Rs. 250.00/kg', change: '-5.00', isUp: false, icon: '🧅' },
-      { id: 3, name: { English: 'Big Onion', Sinhala: 'බී ළූණු', Tamil: 'வெங்காயம்' }, price: 'Rs. 295.00/kg', change: '+12.00', isUp: true, icon: '🧅' },
-      { id: 4, name: { English: 'Tomato', Sinhala: 'තක්කාලි', Tamil: 'தக்காளி' }, price: 'Rs. 170.00/kg', change: '-10.00', isUp: false, icon: '🍅' },
-      { id: 5, name: { English: 'Carrot', Sinhala: 'කැරට්', Tamil: 'கஜரட்' }, price: 'Rs. 135.00/kg', change: '-10.00', isUp: false, icon: '🥕' },
-      { id: 6, name: { English: 'Cabbage', Sinhala: 'ගෝවා', Tamil: 'முட்டைகோஸ்' }, price: 'Rs. 220.00/kg', change: '+10.00', isUp: true, icon: '🥬' },
-      { id: 7, name: { English: 'Potato', Sinhala: 'අර්තාපල්', Tamil: 'உருளைக்கிழங்கு' }, price: 'Rs. 210.00/kg', change: '+8.00', isUp: true, icon: '🥔' },
-      { id: 8, name: { English: 'Green Chilli', Sinhala: 'අමු මිරිස්', Tamil: 'பச்சை மிளகாய்' }, price: 'Rs. 480.00/kg', change: '+30.00', isUp: true, icon: '🌶️' },
-      { id: 9, name: { English: 'Beans', Sinhala: 'බෝංචි', Tamil: 'பீன்ஸ்' }, price: 'Rs. 260.00/kg', change: '-5.00', isUp: false, icon: '🌿' },
-      { id: 10, name: { English: 'Pumpkin', Sinhala: 'වට්ටක්කා', Tamil: 'பூசணிக்காய்' }, price: 'Rs. 125.00/kg', change: '+6.00', isUp: true, icon: '🎃' },
-      { id: 11, name: { English: 'Brinjal', Sinhala: 'වම්බටු', Tamil: 'கத்தரிக்காய்' }, price: 'Rs. 190.00/kg', change: '-4.00', isUp: false, icon: '🍆' },
-      { id: 12, name: { English: 'Ladies Finger', Sinhala: 'බණ්ඩක්කා', Tamil: 'வெண்டைக்காய்' }, price: 'Rs. 175.00/kg', change: '+8.00', isUp: true, icon: '🥒' }
-    ]
-  };
-
-  // මධ්‍යස්ථාන ලැයිස්තුව
-  const centers = Object.keys(allCenterPrices);
-
-  // Firebase එකෙන් දත්ත ලබා ගැනීම (Real-time Fetching)
+  // Firebase එකෙන් ලයිව් දත්ත පමණක් ලබා ගැනීම
   useEffect(() => {
     const fetchMarketPricesFromFirebase = async () => {
       try {
         setLoading(true);
-        const docRef = doc(db, 'marketPrices', selectedCenter);
+        const docRef = doc(db, 'marketPrices', 'allCrops');
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -108,27 +55,24 @@ export default function MarketPrices() {
           if (data && data.crops) {
             setFirebaseCrops(data.crops);
           } else {
-            setFirebaseCrops(null);
+            setFirebaseCrops([]);
           }
         } else {
-          setFirebaseCrops(null);
+          setFirebaseCrops([]);
         }
       } catch (error) {
         console.error('Error fetching from Firebase: ', error);
-        setFirebaseCrops(null);
+        setFirebaseCrops([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchMarketPricesFromFirebase();
-  }, [selectedCenter]);
+  }, []);
 
-  // Firebase ඩේටා තිබේ නම් ඒවා පෙන්වීම, නැතහොත් ස්ථාවර දත්ත (allCenterPrices) පෙන්වීම
-  const marketData = firebaseCrops || allCenterPrices[selectedCenter] || allCenterPrices["Peliyagoda Manning Economic Center"];
-
-  // සෙවුම් පහසුකම සඳහා පෙරහන් කිරීම
-  const filteredData = marketData.filter(item => {
+  // සෙවුම් පහසුකම සඳහා පෙරහන් කිරීම (සජීවී දත්ත මත පමණක් ක්‍රියාත්මක වේ)
+  const filteredData = firebaseCrops.filter(item => {
     const nameObj = item.name || {};
     const enName = typeof nameObj === 'string' ? nameObj : (nameObj.English || nameObj.en || '');
     const siName = typeof nameObj === 'object' ? (nameObj.Sinhala || nameObj.si || '') : '';
@@ -140,8 +84,6 @@ export default function MarketPrices() {
       taName.includes(searchTerm)
     );
   });
-
-  const currentDate = new Date().toISOString().split('T')[0];
 
   return (
     <div style={{ 
@@ -179,24 +121,7 @@ export default function MarketPrices() {
           <h2 style={{ margin: 0, fontSize: '18px' }}>{currentText.title}</h2>
           <span style={{ fontSize: '12px', backgroundColor: 'rgba(255,255,255,0.2)', padding: '4px 8px', borderRadius: '6px' }}>Live</span>
         </div>
-
-        {/* Location & Date Filter Bar */}
-        <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '10px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', marginBottom: '10px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', color: '#666', fontWeight: 'bold' }}>📍 {currentText.centerLabel}</span>
-            <span style={{ fontSize: '11px', color: '#2e7d32', fontWeight: 'bold' }}>📅 {currentDate}</span>
-          </div>
-          <select 
-            value={selectedCenter} 
-            onChange={(e) => setSelectedCenter(e.target.value)}
-            style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '12px', backgroundColor: '#fff', outline: 'none' }}
-          >
-            {centers.map((center, index) => (
-              <option key={index} value={center}>{center}</option>
-            ))}
-          </select>
-        </div>
-
+       
         {/* Search Box */}
         <div style={{ marginBottom: '12px' }}>
           <input 
@@ -266,7 +191,7 @@ export default function MarketPrices() {
             })
           ) : (
             <div style={{ padding: '20px', textAlign: 'center', color: '#777', fontSize: '12px' }}>
-              No crops found!
+              No live crops found in database! Please run your scraper.
             </div>
           )}
         </div>
