@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
+import { auth } from './firebase'; // 1. firebase.js එකෙන් auth ඉම්පෝර්ට් කරන්න
+import { signOut } from 'firebase/auth'; // 2. firebase/auth එකෙන් signOut ඉම්පෝර්ට් කරන්න
 
 // භාෂාවන්ට අදාළ වචන ලැයිස්තුව (Dictionary)
 const t = {
@@ -52,6 +54,16 @@ export default function Profile() {
     localStorage.setItem('userLocation', location);
     localStorage.setItem('userEmail', email);
     setIsEditing(false);
+  };
+
+  // 3. Firebase හරහා Logout කිරීම සඳහා අලුතින් එකතු කළ කොටස
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Firebase එකෙන් යූසර්ව අයින් කරයි
+      navigate('/login');  // ඊටපස්සේ කෙළින්ම Login පේජ් එකට යවයි
+    } catch (error) {
+      console.error('Logout failed: ', error);
+    }
   };
 
   return (
@@ -185,9 +197,9 @@ export default function Profile() {
 
           <div style={{ height: '1px', backgroundColor: '#f0f0f0' }}></div>
 
-          {/* Logout */}
+          {/* Logout - මෙතන handleLogout එක සම්බන්ධ කරන ලදී */}
           <div 
-            onClick={() => navigate('/login')}
+            onClick={handleLogout}
             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
           >
             <span style={{ fontSize: '15px', color: '#d32f2f', fontWeight: 'bold' }}>{currentText.logout}</span>

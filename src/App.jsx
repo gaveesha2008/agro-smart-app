@@ -14,6 +14,8 @@ import FarmingReminder from './FarmingReminder';
 import MarketPrices from './MarketPrices';
 import Profile from './Profile';
 import Language from './Language';
+import Login from './Login';
+
 
 function AppContent() {
   const location = useLocation();
@@ -26,6 +28,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<GetStarted />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
         <Route path="/weather" element={<WeatherUpdates />} />
         <Route path="/my-crops" element={<MyCrops />} />

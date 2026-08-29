@@ -1,8 +1,9 @@
 import time
-import requests
-from bs4 import BeautifulSoup
 import firebase_admin
 from firebase_admin import credentials, firestore
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
 # Firebase සම්බන්ධ කරගැනීම
 if not firebase_admin._apps:
@@ -14,67 +15,67 @@ db = firestore.client()
 def scrape_topgoviya():
     url = "https://topgoviya.lk/"
     
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    
+    driver = webdriver.Chrome(options=options)
     
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        print("Opening website with Selenium...")
+        driver.get(url)
+        time.sleep(6) # ඩේටා සම්පූර්ණයෙන් ලෝඩ් වීමට තත්පර 6ක් ඉඳීම
         
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            crops_list = []
-            
-            # වෙබ් අඩවියේ මිල ගණන් පෙන්වන සැබෑ කොටස් (rows / divs) නිවැරදිව සෙවීම
-            # මෙහිදී ටේබල් පේළි හෝ ලැයිස්තු අයිතම පරීක්ෂා කරමු
-            for item in soup.find_all(['tr', 'li', 'div']):
-                text = item.get_text(separator="|", strip=True)
-                
-                # මිලක් සහ බෝග නමක් අඩංගු වන අවස්ථා පමණක් ফিল්ටර් කිරීම
-                if "Rs" in text or "රු" in text:
-                    parts = [p.strip() for p in text.split("|") if p.strip()]
+        crops_list = []
+        
+        # වෙබ් අඩවියේ ඇති සියලුම div අයිතම පරීක්ෂා කිරීම
+        elements = driver.find_elements(By.TAG_NAME, 'div')
+        
+        for ele in elements:
+            text = ele.text.strip()
+            # "Rs" හෝ "රු" අඩංගු සහ මිලක් පෙන්වන කොටස් සෙවීම
+            if ("Rs" in text or "රු" in text) and len(text) < 150:
+                lines = [line.strip() for line in text.split('\n') if line.strip()]
+                if len(lines) >= 2:
+                    crop_name = lines[0]
+                    price_val = lines[1] if ("Rs" in lines[1] or "රු" in lines[1]) else (lines[0] if "Rs" in lines[0] else "")
                     
-                    if len(parts) >= 2:
-                        crop_name = parts[0]
-                        price_val = parts[1] if ("Rs" in parts[1] or "රු" in parts[1]) else (parts[2] if len(parts) > 2 and ("Rs" in parts[2] or "රු" in parts[2]) else "")
-                        
-                        # අනවශ්‍ය මෙනු සහ සයිට් එකේ විස්තර වචන සම්පූර්ණයෙන්ම ඉවත් කිරීම
-                        unwanted = ['price', 'monitor', 'about', 'increased', 'decreased', 'retail', 'wholesale', 'harti', 'cbsl', 'home', 'market', 'search']
-                        
-                        if price_val and not any(w in crop_name.lower() for w in unwanted) and len(crop_name) < 30:
-                            # ඩුප්ලිකේට් වැළැක්වීම
-                            if not any(c['name']['English'] == crop_name for c in crops_list):
-                                crops_list.append({
-                                    "id": crop_name[:10].replace(" ", "_").lower(),
-                                    "name": {
-                                        "English": crop_name,
-                                        "Sinhala": crop_name,
-                                        "Tamil": crop_name
-                                    },
-                                    "price": price_val,
-                                    "change": "Live",
-                                    "isUp": True,
-                                    "icon": "🌿"
-                                })
+                    # වෙනත් නුසුදුසු වචන සහ වැරදි පේළි ෆිල්ටර් කිරීම
+                    unwanted = ['home', 'market', 'price', 'search', 'about', 'menu', 'login']
+                    
+                    # නම සහ මිල හරියටම තිබී, මිලෙහි "Rs" හෝ "රු" අඩංගු විය යුතුය
+                    if crop_name and price_val and ("Rs" in price_val or "රු" in price_val) and not any(w in crop_name.lower() for w in unwanted) and len(crop_name) < 30:
+                        if not any(c['name']['English'] == crop_name for c in crops_list):
+                            crops_list.append({
+                                "id": crop_name[:10].replace(" ", "_").lower(),
+                                "name": {
+                                    "English": crop_name,
+                                    "Sinhala": crop_name,
+                                    "Tamil": crop_name
+                                },
+                                "price": price_val,
+                                "change": "Live",
+                                "isUp": True,
+                                "icon": "🌿"
+                            })
 
-            # සැබෑ දත්ත සාර්ථකව ලැබුණහොත් පමණක් ෆයර්බේස් අප්ඩේට් කිරීම
-            if crops_list:
-                db.collection('marketPrices').document('allCrops').set({
-                    'crops': crops_list
-                })
-                print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Success! Real original prices updated: {len(crops_list)} items.")
-            else:
-                print("No matching original crop prices found in this cycle.")
-                
+        # පිරිසිදු කළ සැබෑ ඩේටා පමණක් ෆයර්බේස් යැවීම
+        if crops_list:
+            db.collection('marketPrices').document('allCrops').set({
+                'crops': crops_list
+            })
+            print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Success! Clean real prices updated: {len(crops_list)} items.")
         else:
-            print("Failed to connect. Status code:", response.status_code)
+            print("No matching crop prices found.")
             
     except Exception as e:
         print("An error occurred:", e)
+    finally:
+        driver.quit()
 
 if __name__ == "__main__":
-    print("Live Original Price Scraper started...")
+    print("Live Selenium Price Scraper started...")
     while True:
         scrape_topgoviya()
-        # හැම පැයකට වතාවක් ස්වයංක්‍රීයව ලයිව් අප්ඩේට් වේ
         time.sleep(3600)
