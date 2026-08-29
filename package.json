@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@teachablemachine/image": "^0.8.5",
+    "@tensorflow/tfjs": "^4.22.0",
     "axios": "^1.19.0",
     "cheerio": "^1.2.0",
     "firebase": "^12.17.1",
