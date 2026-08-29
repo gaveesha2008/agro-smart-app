@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from './firebase.js'; // firebase.js පාර නිවැරදිව තබා ගන්න
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
 import './App.css';
 import leafLogo from './assets/leaf-logo.png';
 
@@ -10,11 +10,13 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setMessage('');
 
     // ඊමේල් හෝ පාස්වර්ඩ් හිස් නම් පරීක්ෂා කිරීම
     if (!email || !password) {
@@ -26,10 +28,45 @@ function Login() {
       setLoading(true);
       // Firebase හරහා ලොග් වීම
       await signInWithEmailAndPassword(auth, email, password);
+      localStorage.setItem('userEmail', email); // Save email for unique account storage
       navigate('/home');
     } catch (err) {
       console.error(err);
       setError('Failed to login. Please check your email and password.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Please enter your email address first to reset the password.');
+      return;
+    }
+    try {
+      setError('');
+      setMessage('');
+      setLoading(true);
+      await sendPasswordResetEmail(auth, email);
+      setMessage('Password reset email sent! Check your inbox.');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to send password reset email.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      localStorage.setItem('userEmail', result.user.email);
+      navigate('/home');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to login with Google.');
     } finally {
       setLoading(false);
     }
@@ -50,6 +87,7 @@ function Login() {
           <p className="signup-account-subtitle">Enter your email and password to sign in</p>
 
           {error && <p style={{ color: 'red', fontSize: '12px', marginBottom: '10px', textAlign: 'center' }}>{error}</p>}
+          {message && <p style={{ color: 'green', fontSize: '12px', marginBottom: '10px', textAlign: 'center' }}>{message}</p>}
 
           <form onSubmit={handleLogin} style={{ width: '100%' }}>
             <input 
@@ -68,9 +106,15 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="signup-email-input"
-              style={{ marginBottom: '15px' }}
+              style={{ marginBottom: '10px' }}
               required
             />
+            
+            <div style={{ textAlign: 'right', marginBottom: '15px' }}>
+              <span onClick={handleForgotPassword} style={{ color: '#1db954', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}>
+                Forgot Password?
+              </span>
+            </div>
 
             <button type="submit" className="signup-continue-btn" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
@@ -81,16 +125,16 @@ function Login() {
             <span>or</span>
           </div>
 
-          <button className="signup-social-btn" onClick={() => navigate('/home')}>
+          <button className="signup-social-btn" onClick={handleGoogleLogin}>
             Continue with Google
           </button>
           
-          <button className="signup-social-btn" onClick={() => navigate('/home')}>
-            Continue with Apple
-          </button>
+          <p className="signup-policy-text" style={{ marginTop: '15px' }}>
+            Don't have an account? <span onClick={() => navigate('/signup')} style={{color: '#1db954', cursor: 'pointer', fontWeight: 'bold'}}>Sign up</span>
+          </p>
 
           <p className="signup-policy-text">
-            By clicking continue, you agree to our <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a>.
+            By clicking continue, you agree to our <span onClick={() => navigate('/terms')} style={{color: '#1db954', cursor: 'pointer'}}>Terms of Service</span> and <span onClick={() => navigate('/privacy')} style={{color: '#1db954', cursor: 'pointer'}}>Privacy Policy</span>.
           </p>
         </div>
 
@@ -99,4 +143,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Login;// Trigger HMR update

@@ -175,17 +175,6 @@ export default function Profile() {
 
           <div style={{ height: '1px', backgroundColor: '#f0f0f0' }}></div>
 
-          {/* Notifications */}
-          <div 
-            onClick={() => navigate('/notifications')}
-            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-          >
-            <span style={{ fontSize: '15px', color: '#333', fontWeight: '500' }}>{currentText.notifications}</span>
-            <span style={{ fontSize: '18px', color: '#888' }}>&gt;</span>
-          </div>
-
-          <div style={{ height: '1px', backgroundColor: '#f0f0f0' }}></div>
-
           {/* About */}
           <div 
             onClick={() => navigate('/about')}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from './LanguageContext';
 import { useNavigate } from 'react-router-dom';
+import { auth } from './firebase';
 
 const defaultReminders = [
   { id: 1, task: "Watering", date: "2026-07-30", status: "completed" },
@@ -12,8 +13,11 @@ export default function FarmingReminder() {
   const { language } = useLanguage();
   const navigate = useNavigate();
 
+  const userId = auth.currentUser ? auth.currentUser.uid : (localStorage.getItem('userEmail') || 'guest');
+  const storageKey = `farmingReminders_${userId}`;
+
   const [reminders, setReminders] = useState(() => {
-    const saved = localStorage.getItem('farmingReminders');
+    const saved = localStorage.getItem(storageKey);
     return saved ? JSON.parse(saved) : defaultReminders;
   });
 
@@ -23,8 +27,8 @@ export default function FarmingReminder() {
   const [dueDate, setDueDate] = useState('');
 
   useEffect(() => {
-    localStorage.setItem('farmingReminders', JSON.stringify(reminders));
-  }, [reminders]);
+    localStorage.setItem(storageKey, JSON.stringify(reminders));
+  }, [reminders, storageKey]);
 
   const toggleStatus = (id) => {
     const updated = reminders.map(item => {

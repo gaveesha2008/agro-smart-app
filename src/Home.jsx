@@ -6,7 +6,6 @@ import leafLogo from './assets/leaf-logo.png';
 import weatherCard from './assets/weather-card.png';
 import myCropsCard from './assets/my-crops-card.png';
 import diseaseCard from './assets/disease-card.png';
-import monitoringCard from './assets/monitoring-card.png';
 import reminderCard from './assets/reminder-card.png';
 import marketCard from './assets/market-card.png';
 
@@ -22,7 +21,6 @@ export default function Home() {
       weather: "Weather Updates",
       crops: "My Crops",
       disease: "Disease Detection",
-      monitoring: "Crop Monitoring",
       reminder: "Farming Reminder",
       market: "Market Price",
       profileBtn: "User Profile"
@@ -34,7 +32,6 @@ export default function Home() {
       weather: "කාලගුණ යාවත්කාලීන",
       crops: "මගේ වගා",
       disease: "පැලෑටි රෝග හඳුනාගැනීම",
-      monitoring: "වගා නිරීක්ෂණය",
       reminder: "ගොවිතැන් මතක් කිරීම්",
       market: "වෙළඳපළ මිල",
       profileBtn: "පරිශීලක පැතිකඩ"
@@ -46,7 +43,6 @@ export default function Home() {
       weather: "வானிலை நிலவரம்",
       crops: "எனது பயிர்கள்",
       disease: "நோய் கண்டறிதல்",
-      monitoring: "பயிர் கண்காணிப்பு",
       reminder: "விவசாய நினைவூட்டல்",
       market: "சந்தை விலை",
       profileBtn: "பயனர் சுயவிவரம்"
@@ -135,7 +131,7 @@ export default function Home() {
         {/* Market Price */}
         <div 
           onClick={() => navigate('/market-prices')}
-          style={{ backgroundColor: '#efebe9', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+          style={{ gridColumn: 'span 2', width: '100%', boxSizing: 'border-box', backgroundColor: '#efebe9', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
         >
           <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
             <img src={marketCard} alt="Market" style={{ width: '32px', height: '32px', display: 'block' }} />
