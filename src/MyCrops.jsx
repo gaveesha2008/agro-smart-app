@@ -12,8 +12,8 @@ export default function MyCrops() {
     backToCrops: { English: "← Back to My Crops", Sinhala: "← මගේ බෝග වෙත යන්න", Tamil: "← எனது பயிர்களுக்குத் திரும்பு" },
     origin: { English: "Origin & History", Sinhala: "උපත් සහ ඉතිහාසය", Tamil: "தோற்றம் & வரலாறு" },
     growthCultivation: { English: "Growth & Cultivation", Sinhala: "වර්ධනය සහ වගාව", Tamil: "வளர்ச்சி & சாகுபடி" },
-    culinaryUses: { English: "Culinary Uses", Sinhala: "पाक භාවිත", Tamil: "சமையல் பயன்கள்" },
-    nutritionalValue: { English: "Nutritional Value & Benefits", Sinhala: "පෝෂණ අගය සහ ප්‍රතිලාභ", Tamil: "ஊட்டச்சத்து மதிப்பு & நன்மைகள்" },
+    culinaryUses: { English: "Culinary Uses", Sinhala: "සූපශාස්ත්‍ර භාවිත", Tamil: "சமையல் பயன்கள்" },
+    nutritionalValue: { English: "Nutritional Value & Benefits", Sinhala: "පෝෂණ ගුණය සහ ප්‍රතිලාභ", Tamil: "ஊட்டச்சத்து மதிப்பு & நன்மைகள்" },
     category: { English: "Category", Sinhala: "ප්‍රවර්ගය", Tamil: "வகை" }
   };
 
