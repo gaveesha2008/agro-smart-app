@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import * as tf from '@tensorflow/tfjs';
 import * as tmImage from '@teachablemachine/image';
 
-// අක්කා දුන් ලින්ක්ස් දෙක මෙන්න
+
 const PLANT_MODEL_URL = "https://teachablemachine.withgoogle.com/models/cM5ax9hOb/";
 const DISEASE_MODEL_URL = "https://teachablemachine.withgoogle.com/models/xaD5w7ErM/";
 
@@ -88,6 +88,7 @@ export default function DiseaseDetection() {
         try {
           if (plantModel) {
             const pPreds = await plantModel.predict(imgElement);
+            console.log("Plant Predictions:", pPreds);
             setPlantPredictions(pPreds);
           }
           if (diseaseModel) {
