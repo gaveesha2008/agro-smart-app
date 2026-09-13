@@ -18,7 +18,6 @@ function Login() {
     setError('');
     setMessage('');
 
-    // ඊමේල් හෝ පාස්වර්ඩ් හිස් නම් පරීක්ෂා කිරීම
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
@@ -26,9 +25,14 @@ function Login() {
 
     try {
       setLoading(true);
-      // Firebase හරහා ලොග් වීම
-      await signInWithEmailAndPassword(auth, email, password);
-      localStorage.setItem('userEmail', email); // Save email for unique account storage
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Save email and username (using displayName or extracting name from email)
+      localStorage.setItem('userEmail', email);
+      const displayName = user.displayName || email.split('@')[0];
+      localStorage.setItem('userName', displayName);
+
       navigate('/home');
     } catch (err) {
       console.error(err);
@@ -62,7 +66,13 @@ function Login() {
       setLoading(true);
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      localStorage.setItem('userEmail', result.user.email);
+      const user = result.user;
+
+      // Save user details to localStorage upon Google Login
+      localStorage.setItem('userEmail', user.email);
+      const displayName = user.displayName || user.email.split('@')[0];
+      localStorage.setItem('userName', displayName);
+
       navigate('/home');
     } catch (err) {
       console.error(err);
@@ -143,4 +153,4 @@ function Login() {
   );
 }
 
-export default Login;// Trigger HMR update
+export default Login;

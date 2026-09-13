@@ -1460,4 +1460,128 @@ html, body, #root {
 .password-toggle-btn svg {
   width: 20px;
   height: 20px;
+}/* Home Page Styles */
+.home-container {
+  padding: 20px;
+  max-width: 480px;
+  margin: 0 auto;
+  font-family: 'Poppins', sans-serif;
+  background-color: #fcfcfc;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding-bottom: 80px;
+}
+
+/* Banner */
+.home-banner {
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+  margin-bottom: 24px;
+}
+
+.home-banner-text h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.home-banner-text h3 {
+  margin: 5px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.home-banner-text p {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.home-banner-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+/* Feature Cards Grid */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.home-card {
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  min-height: 110px;
+}
+
+.home-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.home-card span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 8px;
+}
+
+.card-icon-box {
+  font-size: 28px;
+}
+
+/* Individual Card Colors (Figma style) */
+.weather-card {
+  background-color: #e3f2fd;
+  border: 1px solid #bbdefb;
+}
+
+.crops-card {
+  background-color: #e8f5e9;
+  border: 1px solid #c8e6c9;
+}
+
+.disease-card {
+  background-color: #e8f5e9;
+  border: 1px solid #c8e6c9;
+}
+
+.reminder-card {
+  background-color: #efebe9;
+  border: 1px solid #d7ccc8;
+}
+
+.market-card {
+  background-color: #f3e5f5;
+  border: 1px solid #e1bee7;
+  grid-column: span 2; /* Market card එක පේළියක් පුරා ලස්සනට පෙන්වීමට */
+}
+
+/* Alert Box */
+.home-alert-box {
+  background-color: #fff9c4;
+  border: 1px solid #fff176;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: #5d4037;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
 }

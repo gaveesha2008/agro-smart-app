@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
-import { auth } from './firebase'; // 1. firebase.js එකෙන් auth ඉම්පෝර්ට් කරන්න
-import { signOut } from 'firebase/auth'; // 2. firebase/auth එකෙන් signOut ඉම්පෝර්ට් කරන්න
+import { auth } from './firebase'; 
+import { signOut, onAuthStateChanged } from 'firebase/auth'; 
 
-// භාෂාවන්ට අදාළ වචන ලැයිස්තුව (Dictionary)
 const t = {
   English: {
     profile: "Profile",
@@ -39,14 +38,29 @@ export default function Profile() {
   const navigate = useNavigate();
   const { language } = useLanguage();
   
-  // දැනට තෝරාගත් භාෂාවට අදාළ වචන ලබා ගැනීම
   const currentText = t[language] || t.English;
 
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(localStorage.getItem('userName') || 'gaveesha');
+  const [name, setName] = useState(localStorage.getItem('userName') || '');
   const [phone, setPhone] = useState(localStorage.getItem('userPhone') || '074 123 0247');
   const [location, setLocation] = useState(localStorage.getItem('userLocation') || 'Galle');
-  const [email, setEmail] = useState(localStorage.getItem('userEmail') || 'guest@agrosmart.com');
+  const [email, setEmail] = useState(localStorage.getItem('userEmail') || '');
+
+  // Firebase auth state listener (Dynamic sync)
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const currentEmail = user.email || '';
+        const currentName = user.displayName || localStorage.getItem('userName') || currentEmail.split('@')[0];
+        
+        setEmail(currentEmail);
+        setName(currentName);
+        localStorage.setItem('userEmail', currentEmail);
+        localStorage.setItem('userName', currentName);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleSave = () => {
     localStorage.setItem('userName', name);
@@ -56,11 +70,14 @@ export default function Profile() {
     setIsEditing(false);
   };
 
-  // 3. Firebase හරහා Logout කිරීම සඳහා අලුතින් එකතු කළ කොටස
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Firebase එකෙන් යූසර්ව අයින් කරයි
-      navigate('/login');  // ඊටපස්සේ කෙළින්ම Login පේජ් එකට යවයි
+      await signOut(auth);
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userPhone');
+      localStorage.removeItem('userLocation');
+      navigate('/login');  
     } catch (error) {
       console.error('Logout failed: ', error);
     }
@@ -75,7 +92,6 @@ export default function Profile() {
       backgroundColor: '#fdfdfd',
       minHeight: '100vh'
     }}>
-      {/* Profile Title */}
       <h2 style={{
         textAlign: 'center',
         fontSize: '26px',
@@ -88,7 +104,6 @@ export default function Profile() {
         {currentText.profile}
       </h2>
 
-      {/* Profile Card Container */}
       <div style={{
         backgroundColor: '#ffffff',
         borderRadius: '18px',
@@ -99,7 +114,6 @@ export default function Profile() {
         margin: '0 auto'
       }}>
         
-        {/* User Info Section */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -144,10 +158,8 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Menu Items */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           
-          {/* Edit Profile */}
           <div 
             onClick={() => setIsEditing(true)}
             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
@@ -158,7 +170,6 @@ export default function Profile() {
 
           <div style={{ height: '1px', backgroundColor: '#f0f0f0' }}></div>
 
-          {/* Language Selection Route */}
           <div 
             onClick={() => navigate('/language')}
             style={{ 
@@ -175,7 +186,6 @@ export default function Profile() {
 
           <div style={{ height: '1px', backgroundColor: '#f0f0f0' }}></div>
 
-          {/* About */}
           <div 
             onClick={() => navigate('/about')}
             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
@@ -186,7 +196,6 @@ export default function Profile() {
 
           <div style={{ height: '1px', backgroundColor: '#f0f0f0' }}></div>
 
-          {/* Logout - මෙතන handleLogout එක සම්බන්ධ කරන ලදී */}
           <div 
             onClick={handleLogout}
             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}

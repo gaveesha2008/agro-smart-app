@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from './firebase.js';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { useLanguage } from './LanguageContext'; // 1. භාෂාව සඳහා මෙය ඉම්පෝර්ට් කරන්න
+import { useLanguage } from './LanguageContext';
 import './App.css';
 import leafLogo from './assets/leaf-logo.png';
 
 function Signup() {
   const navigate = useNavigate();
-  const { language } = useLanguage(); // 2. භාෂාව ලබා ගැනීම
+  const { language } = useLanguage();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +20,6 @@ function Signup() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // 3. භාෂාවට අනුව වෙනස් වන වචන (Text Translation)
   const getTexts = () => {
     switch (language) {
       case 'Sinhala':
@@ -69,27 +68,34 @@ function Signup() {
     setError('');
 
     if (!email || !password || !confirmPassword) {
-      setError('لطفاً සියලුම කොටස් පුරවන්න (Please fill all fields).');
+      setError('Please fill all fields.');
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('පාස්වර්ඩ් එක සමාන නැත (Passwords do not match).');
+      setError('Passwords do not match.');
       return;
     }
 
     if (password.length < 6) {
-      setError('පාස්වර්ඩ් එක අක්ෂර 6කට වඩා වැඩි විය යුතුය.');
+      setError('Password must be at least 6 characters.');
       return;
     }
 
     try {
       setLoading(true);
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Save email and username upon signup
+      localStorage.setItem('userEmail', email);
+      const displayName = user.displayName || email.split('@')[0];
+      localStorage.setItem('userName', displayName);
+
       navigate('/home');
     } catch (err) {
       console.error(err);
-      setError('ගිණුම සෑදීම අසාර්ථකයි. වෙනත් ඊමේල් එකක් උත්සාහ කරන්න.');
+      setError('Signup failed. Try another email.');
     } finally {
       setLoading(false);
     }
@@ -100,7 +106,12 @@ function Signup() {
       setLoading(true);
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      localStorage.setItem('userEmail', result.user.email);
+      const user = result.user;
+
+      localStorage.setItem('userEmail', user.email);
+      const displayName = user.displayName || user.email.split('@')[0];
+      localStorage.setItem('userName', displayName);
+
       navigate('/home');
     } catch (err) {
       console.error(err);
@@ -142,7 +153,6 @@ function Signup() {
               required
             />
             
-            {/* Password Field */}
             <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#333', display: 'block', marginBottom: '5px' }}>{t.passLabel}</label>
             <div className="password-input-wrapper">
               <input 
@@ -173,7 +183,6 @@ function Signup() {
               </button>
             </div>
 
-            {/* Confirm Password Field */}
             <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#333', display: 'block', marginTop: '12px', marginBottom: '5px' }}>{t.confirmPassLabel}</label>
             <div className="password-input-wrapper" style={{ marginBottom: '20px' }}>
               <input 

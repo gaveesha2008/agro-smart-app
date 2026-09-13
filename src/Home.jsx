@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
+import { auth } from './firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import './App.css';
 
-import leafLogo from './assets/leaf-logo.png';
+import logoBanner from './assets/logo-banner.jpg';
 import weatherCard from './assets/weather-card.png';
 import myCropsCard from './assets/my-crops-card.png';
 import diseaseCard from './assets/disease-card.png';
@@ -12,40 +15,48 @@ import marketCard from './assets/market-card.png';
 export default function Home() {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const [userName, setUserName] = useState(localStorage.getItem('userName') || 'Farmer');
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const name = user.displayName || localStorage.getItem('userName') || user.email.split('@')[0];
+        setUserName(name);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const t = {
     English: {
       title: "AgroSmart",
-      welcome: "Hello, Farmer!",
-      subText: "Good morning! Let's make farming smarter today.",
+      welcome: `Hello, ${userName}!`,
+      subText: "Let's make farming smarter today.",
       weather: "Weather Updates",
       crops: "My Crops",
       disease: "Disease Detection",
       reminder: "Farming Reminder",
-      market: "Market Price",
-      profileBtn: "User Profile"
+      market: "Market Price"
     },
     Sinhala: {
-      title: "ඇග්‍රෝ ස්මාර්ට්",
-      welcome: "ආයුබෝවන්, ගොවි මහත්මයා!",
-      subText: "සුභ උදෑසනක්! අද ඔබේ ගොවිතැන් කටයුතු වඩාත් ස්මාර්ට් කරමු.",
+      title: "AgroSmart",
+      welcome: `ආයුබෝවන්, ${userName}!`,
+      subText: "අද ඔබේ ගොවිතැන් කටයුතු වඩාත් ස්මාර්ට් කරමු.",
       weather: "කාලගුණ යාවත්කාලීන",
       crops: "මගේ වගා",
       disease: "පැලෑටි රෝග හඳුනාගැනීම",
       reminder: "ගොවිතැන් මතක් කිරීම්",
-      market: "වෙළඳපළ මිල",
-      profileBtn: "පරිශීලක පැතිකඩ"
+      market: "වෙළඳපළ මිල"
     },
     Tamil: {
-      title: "அக்ரோ-ஸ்மார்ட்",
-      welcome: "வணக்கம், விவசாயியே!",
-      subText: "காலை வணக்கம்! இன்று விவசாயத்தை மிகவும் ஸ்மார்ட்டாக செய்வோம்.",
+      title: "AgroSmart",
+      welcome: `வணக்கம், ${userName}!`,
+      subText: "இன்று விவசாயத்தை மிகவும் ஸ்மார்ட்டாக செய்வோம்.",
       weather: "வானிலை நிலவரம்",
       crops: "எனது பயிர்கள்",
       disease: "நோய் கண்டறிதல்",
       reminder: "விவசாய நினைவூட்டல்",
-      market: "சந்தை விலை",
-      profileBtn: "பயனர் சுயவிவரம்"
+      market: "சந்தை விலை"
     }
   };
 
@@ -53,111 +64,153 @@ export default function Home() {
 
   return (
     <div style={{ 
-      padding: '10px 16px', 
+      padding: '16px 20px', 
       width: '100%', 
       boxSizing: 'border-box', 
       maxWidth: '480px', 
       margin: '0 auto',
-      height: '100vh',
+      minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'space-between'
+      justifyContent: 'flex-start',
+      backgroundColor: '#f9fbf8',
+      paddingBottom: '90px'
     }}>
       
       {/* Top Banner */}
       <div style={{
-        backgroundColor: '#2e7d32',
-        borderRadius: '14px',
-        padding: '14px 16px',
+        backgroundImage: `url(${logoBanner})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        borderRadius: '16px',
+        padding: '24px 22px',
         color: 'white',
-        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+        boxShadow: '0 6px 15px rgba(0,0,0,0.15)',
+        marginBottom: '24px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ margin: 0, fontSize: '20px' }}>{currentText.title}</h2>
-          <img src={leafLogo} alt="Logo" style={{ width: '32px', height: '32px' }} />
-        </div>
-        <p style={{ margin: '8px 0 3px 0', fontSize: '15px', fontWeight: 'bold' }}>{currentText.welcome}</p>
-        <p style={{ margin: 0, fontSize: '12px', opacity: 0.9 }}>{currentText.subText}</p>
+        <h2 style={{ margin: 0, fontSize: '28px', fontWeight: '800', lineHeight: '1.25', textShadow: '0 2px 5px rgba(0,0,0,0.6)' }}>
+          {currentText.title}
+        </h2>
+        <p style={{ margin: '6px 0 3px 0', fontSize: '18px', fontWeight: '700', textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
+          {currentText.welcome}
+        </p>
+        <p style={{ margin: 0, fontSize: '14px', fontWeight: '500', opacity: 0.98, textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}>
+          {currentText.subText}
+        </p>
       </div>
 
       {/* Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
         
         {/* Weather Updates */}
         <div 
           onClick={() => navigate('/weather')}
-          style={{ backgroundColor: '#e3f2fd', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+          style={{ 
+            backgroundColor: '#d0e8fd', 
+            border: '1px solid #b3d9fc',
+            padding: '14px 10px', 
+            borderRadius: '16px', 
+            cursor: 'pointer', 
+            textAlign: 'center', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.03)'
+          }}
         >
-          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
-            <img src={weatherCard} alt="Weather" style={{ width: '32px', height: '32px', display: 'block' }} />
-          </div>
-          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.weather}</h4>
+          <img src={weatherCard} alt="Weather" style={{ width: '100%', height: '70px', objectFit: 'contain', marginBottom: '8px', display: 'block', mixBlendMode: 'multiply' }} />
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#2c3e50', fontWeight: '700' }}>{currentText.weather}</h4>
         </div>
 
         {/* My Crops */}
         <div 
           onClick={() => navigate('/my-crops')}
-          style={{ backgroundColor: '#e8f5e9', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+          style={{ 
+            backgroundColor: '#ccd8b9', 
+            border: '1px solid #b8c7a2',
+            padding: '14px 10px', 
+            borderRadius: '16px', 
+            cursor: 'pointer', 
+            textAlign: 'center', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.03)'
+          }}
         >
-          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
-            <img src={myCropsCard} alt="Crops" style={{ width: '32px', height: '32px', display: 'block' }} />
-          </div>
-          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.crops}</h4>
+          <img src={myCropsCard} alt="Crops" style={{ width: '100%', height: '70px', objectFit: 'contain', marginBottom: '8px', display: 'block', mixBlendMode: 'multiply' }} />
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#2c3e50', fontWeight: '700' }}>{currentText.crops}</h4>
         </div>
 
         {/* Disease Detection */}
         <div 
           onClick={() => navigate('/disease-detection')}
-          style={{ backgroundColor: '#e0f2f1', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+          style={{ 
+            backgroundColor: '#a8c3a6', 
+            border: '1px solid #95b393',
+            padding: '14px 10px', 
+            borderRadius: '16px', 
+            cursor: 'pointer', 
+            textAlign: 'center', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.03)'
+          }}
         >
-          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
-            <img src={diseaseCard} alt="Disease" style={{ width: '32px', height: '32px', display: 'block' }} />
-          </div>
-          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.disease}</h4>
+          <img src={diseaseCard} alt="Disease" style={{ width: '100%', height: '70px', objectFit: 'contain', marginBottom: '8px', display: 'block', mixBlendMode: 'multiply' }} />
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#1e3321', fontWeight: '700' }}>{currentText.disease}</h4>
         </div>
 
-        
         {/* Farming Reminder */}
         <div 
           onClick={() => navigate('/farming-reminder')}
-          style={{ backgroundColor: '#fffde7', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+          style={{ 
+            backgroundColor: '#d8cca8', 
+            border: '1px solid #c5b893',
+            padding: '14px 10px', 
+            borderRadius: '16px', 
+            cursor: 'pointer', 
+            textAlign: 'center', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.03)'
+          }}
         >
-          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
-            <img src={reminderCard} alt="Reminder" style={{ width: '32px', height: '32px', display: 'block' }} />
-          </div>
-          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.reminder}</h4>
+          <img src={reminderCard} alt="Reminder" style={{ width: '100%', height: '70px', objectFit: 'contain', marginBottom: '8px', display: 'block', mixBlendMode: 'multiply' }} />
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#3d321e', fontWeight: '700' }}>{currentText.reminder}</h4>
         </div>
 
         {/* Market Price */}
         <div 
           onClick={() => navigate('/market-prices')}
-          style={{ gridColumn: 'span 2', width: '100%', boxSizing: 'border-box', backgroundColor: '#efebe9', padding: '12px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+          style={{ 
+            gridColumn: 'span 2',
+            backgroundColor: '#e5d1e8', 
+            border: '1px solid #d4bcd8',
+            padding: '14px 10px', 
+            borderRadius: '16px', 
+            cursor: 'pointer', 
+            textAlign: 'center', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.03)'
+          }}
         >
-          <div style={{ backgroundColor: 'white', borderRadius: '50%', padding: '8px', marginBottom: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
-            <img src={marketCard} alt="Market" style={{ width: '32px', height: '32px', display: 'block' }} />
-          </div>
-          <h4 style={{ margin: 0, fontSize: '13px', color: '#333', fontWeight: '600' }}>{currentText.market}</h4>
+          <img src={marketCard} alt="Market" style={{ width: '100%', height: '75px', objectFit: 'contain', marginBottom: '8px', display: 'block', mixBlendMode: 'multiply' }} />
+          <h4 style={{ margin: 0, fontSize: '13px', color: '#402444', fontWeight: '700' }}>{currentText.market}</h4>
         </div>
 
-      </div>
-
-      {/* User Profile Button */}
-      <div 
-        onClick={() => navigate('/profile')}
-        style={{
-          backgroundColor: '#2e7d32',
-          color: 'white',
-          padding: '12px',
-          borderRadius: '12px',
-          textAlign: 'center',
-          fontWeight: 'bold',
-          fontSize: '14px',
-          cursor: 'pointer',
-          boxShadow: '0 4px 10px rgba(46, 125, 50, 0.2)',
-          marginBottom: '55px'
-        }}
-      >
-        {currentText.profileBtn}
       </div>
 
     </div>
