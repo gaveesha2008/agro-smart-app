@@ -152,7 +152,7 @@ export default function MarketPrices() {
 
           {loading ? (
             <div style={{ padding: '25px', textAlign: 'center', color: '#2e7d32', fontSize: '12px', fontWeight: '600' }}>
-              Loading live prices from Firebase...
+              Loading live prices ....
             </div>
           ) : filteredData.length > 0 ? (
             filteredData.map((item, index) => {

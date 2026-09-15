@@ -11,7 +11,10 @@ const DISEASE_MODEL_URL = "https://teachablemachine.withgoogle.com/models/xaD5w7
 export default function DiseaseDetection() {
   const { language } = useLanguage();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
+  
+  // වෙනස්කම් සඳහා Refs දෙකක් පාවිච්චි කරයි (Upload සඳහා එකක් සහ Camera සඳහා එකක්)
+  const uploadInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
   
   const [plantModel, setPlantModel] = useState(null);
   const [diseaseModel, setDiseaseModel] = useState(null);
@@ -24,7 +27,7 @@ export default function DiseaseDetection() {
     English: {
       title: "Disease Detection",
       uploadTitle: "Upload Leaf Image",
-      uploadSub: "Tap to upload or take a photo",
+      uploadSub: "Tap to upload from gallery",
       takePhoto: "Take Photo",
       tip: "Tip: Make sure that leaf is clear and visible for accurate results.",
       plantResult: "Plant Type Results:",
@@ -33,7 +36,7 @@ export default function DiseaseDetection() {
     Sinhala: {
       title: "රෝග හඳුනාගැනීම",
       uploadTitle: "පත්‍රයක පින්තූරයක් උඩුගත කරන්න",
-      uploadSub: "උඩුගත කිරීමට හෝ ඡායාරූපයක් ගැනීමට තට්ටු කරන්න",
+      uploadSub: "ගැලරියෙන් තෝරා ගැනීමට තට්ටු කරන්න",
       takePhoto: "ඡායාරූපයක් ගන්න",
       tip: "ඉඟිය: නිවැරදි ප්‍රතිඵල සඳහා කොළය පැහැදිලිව පෙනෙන බවට වග බලා ගන්න.",
       plantResult: "බෝග වර්ගය හඳුනාගැනීම:",
@@ -42,7 +45,7 @@ export default function DiseaseDetection() {
     Tamil: {
       title: "நோய் கண்டறிதல்",
       uploadTitle: "இலை படத்தைப் பதிவேற்றவும்",
-      uploadSub: "பதிவேற்ற அல்லது புகைப்படம் எடுக்க தட்டவும்",
+      uploadSub: "கேலரியில் இருந்து பதிவேற்ற தட்டவும்",
       takePhoto: "புகைப்படம் எடு",
       tip: "உதவிக்குறிப்பு: துல்லியமான முடிவுகளுக்கு இலை தெளிவாகத் தெரிவதை உறுதி செய்யவும்.",
       plantResult: "தாவர வகை முடிவுகள்:",
@@ -70,11 +73,17 @@ export default function DiseaseDetection() {
     loadModels();
   }, []);
 
-  const handleCaptureClick = () => {
-    fileInputRef.current.click();
+  // උඩ box එක ක්ලික් කළ විට (ගැලරිය විවෘත වේ)
+  const handleUploadClick = () => {
+    uploadInputRef.current.click();
   };
 
-  // ෆොටෝ එකක් දැමූ විට මොඩල්ස් දෙකෙන්ම පරීක්ෂා කිරීම
+  // "Take Photo" බටන් එක ක්ලික් කළ විට (කෙලින්ම කැමරාව විවෘත වේ)
+  const handleCameraClick = () => {
+    cameraInputRef.current.click();
+  };
+
+  // පින්තූරයක් දැමූ විට මොඩල්ස් දෙකෙන්ම පරීක්ෂා කිරීම
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -105,11 +114,22 @@ export default function DiseaseDetection() {
 
   return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto', paddingBottom: '80px' }}>
+      
+      {/* 1. ගැලරිය සඳහා පාවිච්චි කරන input එක (capture නැත) */}
+      <input 
+        type="file" 
+        accept="image/*" 
+        ref={uploadInputRef} 
+        onChange={handleImageChange}
+        style={{ display: 'none' }} 
+      />
+
+      {/* 2. කැමරාව සඳහා පාවිච්චි කරන input එක (capture="environment" ඇත) */}
       <input 
         type="file" 
         accept="image/*" 
         capture="environment" 
-        ref={fileInputRef} 
+        ref={cameraInputRef} 
         onChange={handleImageChange}
         style={{ display: 'none' }} 
       />
@@ -120,20 +140,22 @@ export default function DiseaseDetection() {
         </button>
       </div>
 
-      <div onClick={handleCaptureClick} style={{ border: '2px dashed #2e7d32', padding: '40px', textAlign: 'center', borderRadius: '10px', marginTop: '20px', cursor: 'pointer', background: '#fafafa' }}>
+      {/* උඩ කොටස ක්ලික් කළොත් ගැලරිය ඕන් වේ */}
+      <div onClick={handleUploadClick} style={{ border: '2px dashed #2e7d32', padding: '40px', textAlign: 'center', borderRadius: '10px', marginTop: '20px', cursor: 'pointer', background: '#fafafa' }}>
         {imageSrc ? (
           <img src={imageSrc} alt="Uploaded Leaf" style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px' }} />
         ) : (
           <>
-            <div style={{ fontSize: '40px', color: '#2e7d32', marginBottom: '10px' }}>📸</div>
+            <div style={{ fontSize: '40px', color: '#2e7d32', marginBottom: '10px' }}>📁</div>
             <h3 style={{ margin: '0' }}>{t.uploadTitle}</h3>
             <p style={{ color: '#666', fontSize: '14px' }}>{t.uploadSub}</p>
           </>
         )}
       </div>
 
+      {/* "Take Photo" බටන් එක ක්ලික් කළොත් කෙලින්ම කැමරාව ඕන් වේ */}
       <button 
-        onClick={handleCaptureClick} 
+        onClick={handleCameraClick} 
         style={{ width: '100%', background: '#00b074', color: 'white', border: 'none', padding: '15px', marginTop: '20px', borderRadius: '8px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
       >
         📷 {t.takePhoto}

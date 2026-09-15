@@ -53,7 +53,8 @@ export default function WeatherUpdates() {
       pressure: "PRESSURE",
       minMax: "MIN / MAX TEMP",
       visibility: "VISIBILITY",
-      back: "Back to Home"
+      back: "Back to Home",
+      errorMsg: "City name may be incorrect or please check your API Key." // මෙන්න English Error එක
     },
     Sinhala: {
       title: "AgroSmart කාලගුණය",
@@ -65,7 +66,8 @@ export default function WeatherUpdates() {
       pressure: "පීඩනය",
       minMax: "අවම / උපරිම උෂ්ණත්වය",
       visibility: "පෙනෙන දුර",
-      back: "මුල් පිටුවට යන්න"
+      back: "මුල් පිටුවට යන්න",
+      errorMsg: "නගරයේ නම වැරදි වන්නට පුළුවන. නැතහොත් API Key එක පරීක්ෂා කරන්න." // සිංහල Error එක
     },
     Tamil: {
       title: "AgroSmart வானிலை",
@@ -77,7 +79,8 @@ export default function WeatherUpdates() {
       pressure: "அழுத்தம்",
       minMax: "குறைந்த / அதிக வெப்பநிலை",
       visibility: "பார்வை தூரம்",
-      back: "முகப்புக்குச் செல்லவும்"
+      back: "முகப்புக்குச் செல்லவும்",
+      errorMsg: "நகரத்தின் பெயர் தவறாக இருக்கலாம் அல்லது API விசையைச் சரிபார்க்கவும்." // Tamil Error එක
     }
   };
 
@@ -167,7 +170,8 @@ export default function WeatherUpdates() {
 
         </div>
       ) : (
-        <p style={{ textAlign: 'center', color: 'red', fontSize: '13px' }}>නගරයේ නම වැරදි වන්නට පුළුවන. නැතහොත් API Key එක පරීක්ෂා කරන්න.</p>
+        // මෙන්න මෙතන දැන් තෝරාගත් භාෂාවට අදාළව errorMsg එක පෙන්වයි
+        <p style={{ textAlign: 'center', color: 'red', fontSize: '13px' }}>{t.errorMsg}</p>
       )}
 
       {/* Back Button */}
