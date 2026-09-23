@@ -11,14 +11,14 @@ const DISEASE_MODEL_URL = "https://teachablemachine.withgoogle.com/models/xaD5w7
 export default function DiseaseDetection() {
   const { language } = useLanguage();
   const navigate = useNavigate();
-  
+
   // වෙනස්කම් සඳහා Refs දෙකක් පාවිච්චි කරයි (Upload සඳහා එකක් සහ Camera සඳහා එකක්)
   const uploadInputRef = useRef(null);
   const cameraInputRef = useRef(null);
-  
+
   const [plantModel, setPlantModel] = useState(null);
   const [diseaseModel, setDiseaseModel] = useState(null);
-  const [plantPredictions, setPlantPredictions] = useState([]);
+  const [plantPredictions, setPlantPredictions] = useState(null);
   const [diseasePredictions, setDiseasePredictions] = useState([]);
   const [imageSrc, setImageSrc] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ export default function DiseaseDetection() {
       uploadSub: "Tap to upload from gallery",
       takePhoto: "Take Photo",
       tip: "Tip: Make sure that leaf is clear and visible for accurate results.",
-      plantResult: "Plant Type Results:",
+      plantResult: "Plant Type Result:",
       diseaseResult: "Disease Detection Results:"
     },
     Sinhala: {
@@ -62,7 +62,7 @@ export default function DiseaseDetection() {
         console.log("Loading models...");
         const loadedPlantModel = await tmImage.load(PLANT_MODEL_URL + "model.json", PLANT_MODEL_URL + "metadata.json");
         const loadedDiseaseModel = await tmImage.load(DISEASE_MODEL_URL + "model.json", DISEASE_MODEL_URL + "metadata.json");
-        
+
         setPlantModel(loadedPlantModel);
         setDiseaseModel(loadedDiseaseModel);
         console.log("Both Teachable Machine Models Loaded Successfully!");
@@ -98,11 +98,24 @@ export default function DiseaseDetection() {
           if (plantModel) {
             const pPreds = await plantModel.predict(imgElement);
             console.log("Plant Predictions:", pPreds);
-            setPlantPredictions(pPreds);
-          }
-          if (diseaseModel) {
-            const dPreds = await diseaseModel.predict(imgElement);
-            setDiseasePredictions(dPreds);
+            
+            // reduce is synchronous, no await needed
+            const highestPrediction = pPreds.reduce((prev, current) =>
+              (prev.probability > current.probability) ? prev : current
+            );
+            
+            setPlantPredictions(highestPrediction);
+
+            // Call the disease model only if the highest plant prediction is Tomato
+            if (highestPrediction.className === 'Tomato') {
+              if (diseaseModel) {
+                const dPreds = await diseaseModel.predict(imgElement);
+                setDiseasePredictions(dPreds);
+              }
+            } else {
+              // Optional: Clear previous disease predictions if it's not a tomato
+              setDiseasePredictions([]); 
+            }
           }
         } catch (err) {
           console.error("Prediction error:", err);
@@ -114,24 +127,24 @@ export default function DiseaseDetection() {
 
   return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto', paddingBottom: '80px' }}>
-      
+
       {/* 1. ගැලරිය සඳහා පාවිච්චි කරන input එක (capture නැත) */}
-      <input 
-        type="file" 
-        accept="image/*" 
-        ref={uploadInputRef} 
+      <input
+        type="file"
+        accept="image/*"
+        ref={uploadInputRef}
         onChange={handleImageChange}
-        style={{ display: 'none' }} 
+        style={{ display: 'none' }}
       />
 
       {/* 2. කැමරාව සඳහා පාවිච්චි කරන input එක (capture="environment" ඇත) */}
-      <input 
-        type="file" 
-        accept="image/*" 
-        capture="environment" 
-        ref={cameraInputRef} 
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        ref={cameraInputRef}
         onChange={handleImageChange}
-        style={{ display: 'none' }} 
+        style={{ display: 'none' }}
       />
 
       <div style={{ background: '#2e7d32', color: 'white', padding: '15px', borderRadius: '10px', display: 'flex', alignItems: 'center' }}>
@@ -154,8 +167,8 @@ export default function DiseaseDetection() {
       </div>
 
       {/* "Take Photo" බටන් එක ක්ලික් කළොත් කෙලින්ම කැමරාව ඕන් වේ */}
-      <button 
-        onClick={handleCameraClick} 
+      <button
+        onClick={handleCameraClick}
         style={{ width: '100%', background: '#00b074', color: 'white', border: 'none', padding: '15px', marginTop: '20px', borderRadius: '8px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
       >
         📷 {t.takePhoto}
@@ -164,15 +177,13 @@ export default function DiseaseDetection() {
       {loading && <p style={{ textAlign: 'center', marginTop: '15px', color: '#2e7d32' }}>Analyzing image...</p>}
 
       {/* බෝග වර්ගයේ ප්‍රතිඵල */}
-      {plantPredictions.length > 0 && (
+      {plantPredictions && (
         <div style={{ marginTop: '20px', padding: '15px', background: '#e8f5e9', borderRadius: '8px' }}>
           <h4 style={{ margin: '0 0 10px 0', color: '#2e7d32' }}>{t.plantResult}</h4>
-          {plantPredictions.map((p, index) => (
-            <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '14px' }}>
-              <span><strong>{p.className}</strong></span>
-              <span>{(p.probability * 100).toFixed(1)}%</span>
-            </div>
-          ))}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '14px' }}>
+            <span><strong>{plantPredictions?.className}</strong></span>
+            <span>{(plantPredictions?.probability * 100).toFixed(1)}%</span>
+          </div>
         </div>
       )}
 
