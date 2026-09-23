@@ -19,12 +19,12 @@ import TermsOfService from './TermsOfService';
 import PrivacyPolicy from './PrivacyPolicy';
 import About from './About';
 import ProtectedRoutes from './ProtectedRoutes';
+import NotFound from './NotFound'; // 1. මෙතනින් 404 page එක import කරන්න
 
 
 function AppContent() {
   const location = useLocation();
   
-  // GetStarted, Signup, and Login යන පිටු වලදී පමණක් BottomNav එක නොපෙන්වීම සඳහා
   const showBottomNav = !['/', '/signup', '/login', '/terms', '/privacy', '/about'].includes(location.pathname);
 
   return (
@@ -49,6 +49,9 @@ function AppContent() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/language" element={<Language />} />
         </Route>
+
+        {/* 2. වැරදි URL එකක් ගැසූ විට ක්‍රියාත්මක වන 404 Route එක */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {showBottomNav && <BottomNav />}
     </div>
