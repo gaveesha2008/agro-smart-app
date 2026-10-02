@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from './firebase';
 
 const defaultReminders = [
-  { id: 1, task: "Watering", date: "2026-07-30", status: "completed" },
-  { id: 2, task: "Fertilizer Application", date: "2026-08-02", status: "upcoming" },
-  { id: 3, task: "Pesticide Spraying", date: "2026-08-05", status: "upcoming" }
+  { id: 1, task: "Watering", date: "2026-10-02", status: "completed" }, // වර්තමාන දිනයට ගැළපෙන පරිදි සකස් කරන ලදී
+  { id: 2, task: "Fertilizer Application", date: "2026-10-05", status: "upcoming" },
+  { id: 3, task: "Pesticide Spraying", date: "2026-10-08", status: "upcoming" }
 ];
 
 export default function FarmingReminder() {
@@ -26,8 +26,33 @@ export default function FarmingReminder() {
   const [taskName, setTaskName] = useState('');
   const [dueDate, setDueDate] = useState('');
 
+  // බ්‍රව්සර් නොටිფიකේෂන් සඳහා අවසර ඉල්ලීම (Notification Permission Request)
+  useEffect(() => {
+    if ('Notification' in window) {
+      if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        Notification.requestPermission();
+      }
+    }
+  }, []);
+
+  // දිනට අදාළව නොටිფიකේෂන් යැවීම පරීක්ෂා කිරීම
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(reminders));
+
+    // වර්තමාන දිනය ලබා ගැනීම (YYYY-MM-DD)
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    reminders.forEach(item => {
+      if (item.date === todayStr && item.status === 'upcoming') {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          // බ්‍රව්සර් නොටිფიකේෂන් එක පෙන්වීම
+          new Notification("AgroSmart Reminder 🌿", {
+            body: `Task Due Today: ${item.task}`,
+            icon: '/favicon.ico'
+          });
+        }
+      }
+    });
   }, [reminders, storageKey]);
 
   const toggleStatus = (id) => {
@@ -43,13 +68,28 @@ export default function FarmingReminder() {
   const handleAddReminder = (e) => {
     e.preventDefault();
     if (!taskName || !dueDate) return;
+    
     const newReminder = {
       id: Date.now(),
       task: taskName,
       date: dueDate,
       status: 'upcoming'
     };
-    setReminders([...reminders, newReminder]);
+
+    const updatedReminders = [...reminders, newReminder];
+    setReminders(updatedReminders);
+    
+    // අලුතින් එකතු කළ මතක් කිරීමේ දිනය අද දිනම නම් වහාම නොටිფიකේෂන් එකක් පෙන්වීම
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (dueDate === todayStr) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification("New Farming Reminder 🌿", {
+          body: `Task: ${taskName} is scheduled for today!`,
+          icon: '/favicon.ico'
+        });
+      }
+    }
+
     setTaskName('');
     setDueDate('');
     setIsAdding(false);
@@ -98,7 +138,7 @@ export default function FarmingReminder() {
       all: "அனைத்தும்",
       upcoming: "வரவிருப்பவை",
       completed: "முடிந்தவை",
-      addBtn: "நினைவூட்டலைச் சேර්",
+      addBtn: "நினைவூட்டலைச் சேர்",
       taskLabel: "பணியின் பெயர்",
       dateLabel: "தேதி",
       save: "சேமி",
