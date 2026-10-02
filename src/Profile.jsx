@@ -42,26 +42,18 @@ export default function Profile() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(localStorage.getItem('userName') || '');
-  
-  // මෙහි ඩිෆෝල්ට් අංකය ඉවත් කර, localStorage එකෙන් හෝ ඊමේල් එකට අදාළව සේව් වූ අංකය ලබා ගැනීමට සකසා ඇත
-  const [phone, setPhone] = useState(localStorage.getItem('userPhone') || '');
   const [location, setLocation] = useState(localStorage.getItem('userLocation') || 'Galle');
   const [email, setEmail] = useState(localStorage.getItem('userEmail') || '');
 
-  // Firebase auth state listener (Dynamic sync for email and phone)
+  // Firebase auth state listener (Dynamic sync)
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const currentEmail = user.email || '';
         const currentName = user.displayName || localStorage.getItem('userName') || currentEmail.split('@')[0];
         
-        // localStorage එකෙන් අදාළ ඊමේල් එකට අදාළ ෆෝන් නම්බර් එක ලබා ගැනීම (ඔබ Signup වෙද්දී ඊමේල් එකත් සමඟ ෆෝන් අංකය ද සේව් කළ යුතුයි)
-        const savedPhone = localStorage.getItem(`userPhone_${currentEmail}`) || localStorage.getItem('userPhone') || '';
-
         setEmail(currentEmail);
         setName(currentName);
-        setPhone(savedPhone);
-
         localStorage.setItem('userEmail', currentEmail);
         localStorage.setItem('userName', currentName);
       }
@@ -71,10 +63,6 @@ export default function Profile() {
 
   const handleSave = () => {
     localStorage.setItem('userName', name);
-    localStorage.setItem('userPhone', phone);
-    if (email) {
-      localStorage.setItem(`userPhone_${email}`, phone); // ඊමේල් එකට අදාළව ෆෝන් අංකය තවදුරටත් සුරක්ෂිත කිරීම
-    }
     localStorage.setItem('userLocation', location);
     localStorage.setItem('userEmail', email);
     setIsEditing(false);
@@ -85,7 +73,6 @@ export default function Profile() {
       await signOut(auth);
       localStorage.removeItem('userName');
       localStorage.removeItem('userEmail');
-      localStorage.removeItem('userPhone');
       localStorage.removeItem('userLocation');
       navigate('/login');  
     } catch (error) {
@@ -152,7 +139,6 @@ export default function Profile() {
             {isEditing ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <input type="text" value={name} onChange={(e) => setName(e.target.value)} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }} placeholder="Name" />
-                <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }} placeholder="Phone Number" />
                 <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }} placeholder="Location" />
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }} placeholder="Email" />
                 <button onClick={handleSave} style={{ backgroundColor: '#2e7d32', color: 'white', border: 'none', padding: '8px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>{currentText.save}</button>
@@ -160,9 +146,8 @@ export default function Profile() {
             ) : (
               <div>
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#222' }}>{name}</h3>
-                <p style={{ margin: '4px 0 2px 0', fontSize: '14px', color: '#555' }}>{phone || 'No phone number added'}</p>
-                <p style={{ margin: '0 0 2px 0', fontSize: '13px', color: '#777' }}>{email}</p>
-                <p style={{ margin: 0, fontSize: '14px', color: '#2e7d32', fontWeight: 'bold' }}>📍 {location}</p>
+                <p style={{ margin: '4px 0 2px 0', fontSize: '13px', color: '#777' }}>{email}</p>
+                <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#2e7d32', fontWeight: 'bold' }}>📍 {location}</p>
               </div>
             )}
           </div>
@@ -200,7 +185,7 @@ export default function Profile() {
             onClick={() => navigate('/about')}
             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
           >
-            <span style={{ fontSize: '15px', color: '#333', fontWeight: '500'  }}>{currentText.about}</span>
+            <span style={{ fontSize: '15px', color: '#333', fontWeight: '500' }}>{currentText.about}</span>
             <span style={{ fontSize: '18px', color: '#888' }}>&gt;</span>
           </div>
 
